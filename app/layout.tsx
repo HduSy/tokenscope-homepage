@@ -121,6 +121,15 @@ export default function RootLayout({
       className={`${ibmSans.variable} ${ibmMono.variable} ${spaceGrotesk.variable}`}
     >
       <head>
+        {/* Tag <html> with .js before the body paints, so CSS can gate
+            JS-only entrance animations (Reveal, chart anims) behind html.js.
+            Without JS this never runs → those animations' hidden start state
+            is skipped and the whole page renders visible (SSR / no-JS safe). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
         {/* UI icons are inlined as SVG paths via <Icon/> (components/Icon.tsx)
             — no external icon-font stylesheet, so nothing in <head> blocks
             first paint on icon account. */}

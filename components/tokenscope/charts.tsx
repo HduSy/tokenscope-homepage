@@ -4,7 +4,7 @@
 // same inline-style approach — keeps the panel pixel-identical to the real
 // macOS app.
 
-import { useId, useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { useInView } from "../useInView";
 import {
   Theme,
@@ -279,12 +279,23 @@ export function BarList({ items, theme, accent, limit = 5, animate = false }:
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 9, padding: "3px 0" }}>
           <span style={{ font: `500 10.5px ${t.mono}`, color: t.text, flex: "0 0 134px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.name}</span>
           <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.gridLine, overflow: "hidden" }}>
-            <div style={{
-              width: `${animate && !grow ? 0 : (it.count / max) * 100}%`,
-              height: "100%", background: accent, borderRadius: 3,
-              transition: animate ? "width .7s cubic-bezier(0.16,1,0.3,1)" : undefined,
-              transitionDelay: animate ? `${i * 70}ms` : undefined,
-            }} />
+            {animate ? (
+              // Animated fill: width comes from the --w var; CSS (.bar-anim)
+              // holds it at 0 until .in flips, gated behind html.js so the bar
+              // shows at full width with no JS.
+              <div
+                className={`bar-anim${grow ? " in" : ""}`}
+                style={{
+                  "--w": `${(it.count / max) * 100}%`,
+                  height: "100%",
+                  background: accent,
+                  borderRadius: 3,
+                  transitionDelay: `${i * 70}ms`,
+                } as CSSProperties}
+              />
+            ) : (
+              <div style={{ width: `${(it.count / max) * 100}%`, height: "100%", background: accent, borderRadius: 3 }} />
+            )}
           </div>
           <span style={{ font: `600 10.5px ${t.mono}`, color: t.dim, flex: "0 0 auto", minWidth: 30, textAlign: "right" }}>{fmtInt(it.count)}</span>
         </div>
@@ -364,15 +375,14 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
               <div key={di}
                 onMouseEnter={d ? (e) => onCell(d, e) : undefined}
                 onMouseLeave={() => setHi(null)}
+                className={animate ? `heat-anim${inView ? " in" : ""}` : undefined}
                 style={{
                   width: "100%", aspectRatio: "1 / 1", borderRadius: 2,
                   background: d ? ramp(accent!, d.level, t.gridLine, t.card) : "transparent",
-                  ...(animate ? {
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "scale(1)" : "scale(0.35)",
-                    transition: "opacity .35s ease, transform .35s cubic-bezier(0.16,1,0.3,1)",
-                    transitionDelay: `${wi * 16}ms`,
-                  } : {}),
+                  // Hidden/visible state is driven by the .heat-anim class
+                  // (gated behind html.js); only the per-column stagger delay
+                  // stays inline.
+                  ...(animate ? { transitionDelay: `${wi * 16}ms` } : {}),
                 }} />
             ))}
           </div>
