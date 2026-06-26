@@ -27,7 +27,7 @@ const rungs: { mul: string; name: string; why: string; colorClass: string }[] = 
 
 export function TokenTypes() {
   return (
-    <section id="pricing" className="py-16 sm:py-24">
+    <section id="pricing" className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
@@ -44,7 +44,10 @@ export function TokenTypes() {
             <Reveal
               key={r.name}
               as="div"
-              delayIndex={i}
+              // 3× the default stagger: each rung waits ~210ms after the
+              // previous (vs the page-wide 70ms cadence) so the four cards
+              // visibly cascade in instead of looking near-simultaneous.
+              delayIndex={i * 3}
               className="rounded-[var(--radius-lg)] border border-border bg-card p-6"
             >
               <div

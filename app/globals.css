@@ -9,7 +9,7 @@
   --color-card-2: #1a1d20;
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-strong: rgba(255, 255, 255, 0.12);
-  --color-grid-line: rgba(255, 255, 255, 0.06);
+  --color-grid-line: rgba(255, 255, 255, 0.035);
   --color-text: rgba(255, 255, 255, 0.94);
   --color-dim: rgba(255, 255, 255, 0.52);
   --color-faint: rgba(255, 255, 255, 0.34);
@@ -30,6 +30,17 @@
     0 24px 60px -28px rgba(0, 0, 0, 0.7);
   --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 40px 90px -36px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--color-border);
+
+  /* Terminal block tokens — used by <Install/>. Defaults here are the
+     dark-mode palette; the light override below swaps them all. */
+  --terminal-bg: #0c0e10;
+  --terminal-fg: #e6e8e6;
+  --terminal-prompt: #28c840;
+  --terminal-highlight: #5fcf9c;
+  --terminal-divider: rgba(255, 255, 255, 0.1);
+  --terminal-btn-bg: rgba(255, 255, 255, 0.06);
+  --terminal-btn-bg-hover: rgba(255, 255, 255, 0.12);
+  --terminal-btn-border: rgba(255, 255, 255, 0.1);
 }
 
 /* Light theme overrides — same variable names so all Tailwind utilities swap. */
@@ -40,7 +51,7 @@
   --color-card-2: #f6f8f4;
   --color-border: rgba(15, 22, 18, 0.1);
   --color-border-strong: rgba(15, 22, 18, 0.16);
-  --color-grid-line: rgba(0, 0, 0, 0.07);
+  --color-grid-line: rgba(0, 0, 0, 0.04);
   --color-text: rgba(17, 22, 19, 0.94);
   --color-dim: rgba(17, 22, 19, 0.56);
   --color-faint: rgba(17, 22, 19, 0.38);
@@ -53,6 +64,19 @@
     0 18px 40px -26px rgba(15, 22, 18, 0.2);
   --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 30px 70px -34px rgba(15, 22, 18, 0.26), 0 0 0 1px var(--color-border);
+
+  /* Terminal in light theme: paper-pale background, ink-dark text, deep
+     accent green for both the prompt `$` and the highlighted argument.
+     Traffic-light dots stay at their macOS-canonical colours (red/amber/
+     green) regardless of theme — they're inlined in the component. */
+  --terminal-bg: #f5f7f2;
+  --terminal-fg: #1b2017;
+  --terminal-prompt: #178a55;
+  --terminal-highlight: #178a55;
+  --terminal-divider: rgba(15, 22, 18, 0.1);
+  --terminal-btn-bg: rgba(15, 22, 18, 0.05);
+  --terminal-btn-bg-hover: rgba(15, 22, 18, 0.1);
+  --terminal-btn-border: rgba(15, 22, 18, 0.12);
 }
 
 /* The accent radial glow lives on a CSS variable because its colour swaps. */
@@ -77,19 +101,31 @@ html {
 
 body {
   background-color: var(--color-bg);
-  /* Subtle grid lines using the same --color-grid-line that panels use
-     internally — keeps the whole page on one ambient background and
-     swaps along with the theme. 32px cell size = denser/lighter feel,
-     reads more as texture than as a draftsman's grid. */
-  background-image:
-    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
-  background-size: 32px 32px;
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Establish a stacking context so the fixed grid pseudo with z-index:-1
+     sits below body's children but above body's own background-color. */
+  isolation: isolate;
+}
+
+/* Page-wide grid texture. Implemented as a fixed-position pseudo instead of
+   `background-attachment: fixed` on body — Lenis (and several mobile WebKit
+   quirks) can break fixed-attachment backgrounds when the document is being
+   transformed for smooth scroll. A fixed pseudo is anchored to the viewport
+   no matter what the scroll system does. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 h1,

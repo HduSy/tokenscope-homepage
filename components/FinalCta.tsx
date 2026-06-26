@@ -6,7 +6,7 @@ import { Reveal } from "./Reveal";
 
 export function FinalCta() {
   return (
-    <section className="py-16 sm:py-24">
+    <section className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal
           as="div"

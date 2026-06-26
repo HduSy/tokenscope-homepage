@@ -3,7 +3,7 @@ import { Reveal } from "./Reveal";
 
 export function InstallSection() {
   return (
-    <section id="install" className="py-16 sm:py-24">
+    <section id="install" className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
@@ -34,7 +34,7 @@ export function InstallSection() {
             .dmg from GitHub Releases
           </a>
           . It is an unsigned build, so on first launch right-click the app and choose Open, or
-          run <code className="rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent-soft">xattr -cr /Applications/Tokenscope.app</code> once.
+          run <code className="rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent">xattr -cr /Applications/Tokenscope.app</code> once.
         </Reveal>
       </div>
     </section>

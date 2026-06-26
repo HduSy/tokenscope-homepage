@@ -1,15 +1,17 @@
 import { HeroPanel } from "./HeroPanel";
 import { InstallCtas } from "./InstallCtas";
 
-// Hero: copy on the left, live panel preview on the right. Wrapped in a
-// relative container so the accent glow ::before sits behind both.
+// Hero: copy on the left, live panel preview on the right. The accent glow
+// is `position: fixed` so it stays anchored to the viewport as the page
+// scrolls — feels like ambient lighting that the document slides past,
+// rather than a decoration that falls off-screen with the hero.
 
 export function Hero() {
   return (
-    <header id="top" className="relative overflow-hidden">
+    <header id="top" className="relative">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{ background: "var(--accent-glow)" }}
       />
       <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-6 pt-18 pb-20 md:grid-cols-[1.05fr_0.95fr] md:gap-10 md:pt-21 md:pb-24 lg:grid-cols-[1.1fr_0.9fr]">

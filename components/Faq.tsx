@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "./Icon";
 import { Reveal } from "./Reveal";
 
 // Default-collapsed FAQ. Single-open accordion: parent owns the openIndex,
@@ -10,7 +11,7 @@ import { Reveal } from "./Reveal";
 type Faq = { q: string; a: React.ReactNode };
 
 const code =
-  "rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent-soft";
+  "rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent";
 
 const FAQS: Faq[] = [
   {
@@ -106,22 +107,30 @@ function FaqItem({
   a,
   first,
   open,
-  onToggle,
-}: Faq & { first: boolean; open: boolean; onToggle: () => void }) {
+  onOpen,
+}: Faq & { first: boolean; open: boolean; onOpen: () => void }) {
   return (
-    <div className={first ? "" : "border-t border-border"}>
+    // Hover-to-open: pointing at the row sets the parent's openIndex; the
+    // mouseleave on the surrounding panel collapses everything when the
+    // cursor exits. The click handler is kept so keyboard / touch users
+    // still get a toggle that works without hover.
+    <div
+      className={first ? "" : "border-t border-border"}
+      onMouseEnter={onOpen}
+    >
       <button
         type="button"
-        onClick={onToggle}
+        onClick={onOpen}
         aria-expanded={open}
         className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-grid-line"
       >
         <span className="text-[16.5px] font-medium text-text">{q}</span>
-        <i
-          className={`ph ph-plus text-[18px] transition-[transform,color] duration-300 ease-out ${
+        <Icon
+          name="plus"
+          size={18}
+          className={`transition-[transform,color] duration-300 ease-out ${
             open ? "rotate-45 text-accent" : "text-dim"
           }`}
-          aria-hidden
         />
       </button>
       <div
@@ -139,12 +148,13 @@ function FaqItem({
 }
 
 export function Faq() {
-  // Parent owns which row is open so opening one auto-closes the rest.
-  // null = all collapsed (the default).
+  // Parent owns which row is open so hovering one auto-closes the rest.
+  // null = all collapsed (the default and the state once the cursor leaves
+  // the panel entirely).
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-16 sm:py-24">
+    <section id="faq" className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
@@ -155,20 +165,22 @@ export function Faq() {
           </p>
         </Reveal>
 
-        <Reveal
-          as="div"
-          className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card"
-        >
-          {FAQS.map((item, i) => (
-            <FaqItem
-              key={i}
-              q={item.q}
-              a={item.a}
-              first={i === 0}
-              open={openIndex === i}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-            />
-          ))}
+        <Reveal as="div">
+          <div
+            className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card"
+            onMouseLeave={() => setOpenIndex(null)}
+          >
+            {FAQS.map((item, i) => (
+              <FaqItem
+                key={i}
+                q={item.q}
+                a={item.a}
+                first={i === 0}
+                open={openIndex === i}
+                onOpen={() => setOpenIndex(i)}
+              />
+            ))}
+          </div>
         </Reveal>
       </div>
     </section>

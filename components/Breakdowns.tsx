@@ -59,7 +59,7 @@ export function Breakdowns() {
   const cacheShare = pct(M.cacheTokens, M.totalTokens);
 
   return (
-    <section id="breakdowns" className="py-16 sm:py-24">
+    <section id="breakdowns" className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
@@ -115,7 +115,7 @@ export function Breakdowns() {
           <Reveal
             as="div"
             delayIndex={1}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card-2 p-5.5 md:col-span-7"
+            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-7"
           >
             <h3 className="mb-1 text-[17px] font-semibold">Tools you actually use</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
@@ -166,7 +166,7 @@ export function Breakdowns() {
                 )}
                 <div className="mt-3.5 font-mono text-[11px] leading-[1.5] text-faint">
                   Read from your own{" "}
-                  <code className="font-mono text-[11px] text-accent-soft">
+                  <code className="font-mono text-[11px] text-accent">
                     ~/.claude/skills/
                   </code>{" "}
                   directory.

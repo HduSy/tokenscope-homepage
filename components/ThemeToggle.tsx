@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { Icon } from "./Icon";
 import { useTheme } from "./useTheme";
 
 // Sun/moon toggle in the page nav. On click, wraps the theme flip in a
@@ -54,7 +55,9 @@ export function ThemeToggle() {
           ],
         },
         {
-          duration: 520,
+          // Slow, deliberate reveal — 1300ms lets the eye actually track the
+          // wavefront across the page instead of feeling like a fade.
+          duration: 1300,
           easing: "cubic-bezier(0.16, 1, 0.3, 1)",
           pseudoElement: "::view-transition-new(root)",
         },
@@ -70,7 +73,7 @@ export function ThemeToggle() {
       aria-label="Toggle theme"
       className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-dim transition-[color,border-color,background] hover:text-text hover:border-border-strong"
     >
-      <i className={`ph ph-${dark ? "sun" : "moon"} text-[17px]`} aria-hidden />
+      <Icon name={dark ? "sun" : "moon"} size={17} />
     </button>
   );
 }

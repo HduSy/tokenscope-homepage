@@ -1,18 +1,17 @@
 import Link from "next/link";
-import { BrandMark } from "./BrandMark";
-import { Button } from "./Button";
+import { Icon } from "./Icon";
+import { LogoLink } from "./LogoLink";
 import { ThemeToggle } from "./ThemeToggle";
 
-// Sticky glass nav. Server-rendered shell; the only client island is
-// <ThemeToggle/>. Glass is more transparent now (55% instead of 82%) so the
-// page content reads through it as you scroll.
+// Sticky glass nav. Server-rendered shell; the client islands are
+// <LogoLink/> (back-to-top click) and <ThemeToggle/>. Glass sits at 38%
+// opacity so the page content reads through clearly as you scroll.
 
 const links = [
   { href: "#breakdowns", label: "Breakdowns" },
   { href: "#how", label: "How it works" },
   { href: "#pricing", label: "Token math" },
   { href: "#faq", label: "FAQ" },
-  { href: "#install", label: "Install" },
 ];
 
 export function Nav() {
@@ -20,20 +19,13 @@ export function Nav() {
     <nav
       className="sticky top-0 z-50 border-b border-border backdrop-blur-md"
       style={{
-        background: "color-mix(in srgb, var(--color-bg) 55%, transparent)",
-        WebkitBackdropFilter: "saturate(160%) blur(14px)",
-        backdropFilter: "saturate(160%) blur(14px)",
+        background: "color-mix(in srgb, var(--color-bg) 38%, transparent)",
+        WebkitBackdropFilter: "saturate(160%) blur(16px)",
+        backdropFilter: "saturate(160%) blur(16px)",
       }}
     >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        <Link
-          href="#top"
-          aria-label="Tokenscope home"
-          className="inline-flex items-center gap-2.5 font-sans text-base font-semibold tracking-tight"
-        >
-          <BrandMark size={20} />
-          Tokenscope
-        </Link>
+        <LogoLink />
 
         <div className="hidden items-center gap-6 md:flex">
           {links.map((l) => (
@@ -55,12 +47,9 @@ export function Nav() {
             aria-label="View on GitHub"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-dim transition-[color,border-color,background] hover:text-text hover:border-border-strong"
           >
-            <i className="ph ph-github-logo text-[17px]" aria-hidden />
+            <Icon name="github-logo" size={17} />
           </a>
           <ThemeToggle />
-          <Button as="a" href="#install" size="sm">
-            Install
-          </Button>
         </div>
       </div>
     </nav>

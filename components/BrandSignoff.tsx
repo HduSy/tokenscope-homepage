@@ -3,7 +3,7 @@ import { BackToTop } from "./BackToTop";
 // Bottom slab: giant "Token" outlined + "scope" filled in accent green —
 // emphasises the unique half of the brand the same way the marketing copy
 // does throughout the page. Wordmark stays aria-hidden; the back-to-top
-// button is in its own accessible layer.
+// button is in its own accessible layer pinned to the slab's bottom-right.
 
 export function BrandSignoff() {
   return (

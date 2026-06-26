@@ -1,18 +1,14 @@
 "use client";
 
 import { Button } from "./Button";
-import { BREW_CMD } from "@/lib/data";
-import { showToast } from "./Toast";
+import { Icon } from "./Icon";
 
-// CTA pair used inside the hero and the final CTA card. Clicking copies the
-// brew command and scrolls to the install section.
+// CTA pair used inside the hero and the final CTA card. "Install with
+// Homebrew" just smooth-scrolls to the install section — the brew command
+// there has its own copy button, so we don't copy or toast from here.
 
-function copyBrewAndScroll() {
+function scrollToInstall() {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  navigator.clipboard?.writeText(BREW_CMD).then(
-    () => showToast("Copied brew install"),
-    () => {},
-  );
   document
     .getElementById("install")
     ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
@@ -21,8 +17,8 @@ function copyBrewAndScroll() {
 export function InstallCtas({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
-      <Button onClick={copyBrewAndScroll}>
-        <i className="ph ph-download-simple text-lg" aria-hidden />
+      <Button onClick={scrollToInstall}>
+        <Icon name="download-simple" size={18} />
         Install with Homebrew
       </Button>
       <Button
@@ -32,7 +28,7 @@ export function InstallCtas({ className = "" }: { className?: string }) {
         rel="noopener noreferrer"
         variant="ghost"
       >
-        <i className="ph ph-github-logo text-lg" aria-hidden />
+        <Icon name="github-logo" size={18} />
         View on GitHub
       </Button>
     </div>

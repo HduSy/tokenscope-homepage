@@ -7,7 +7,7 @@ type Variant = "primary" | "ghost";
 type Size = "md" | "sm";
 
 const base =
-  "inline-flex items-center gap-2 rounded-full font-sans font-semibold whitespace-nowrap border border-transparent cursor-pointer transition-[transform,background,border-color,box-shadow] duration-200 active:translate-y-px active:scale-[0.99]";
+  "inline-flex items-center gap-2 rounded-full font-sans font-semibold whitespace-nowrap border border-transparent cursor-pointer transition-[background,border-color,box-shadow] duration-200";
 
 const sizes: Record<Size, string> = {
   md: "px-5 py-3 text-[15px]",
@@ -16,9 +16,9 @@ const sizes: Record<Size, string> = {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-accent text-accent-ink shadow-[0_10px_24px_-12px_color-mix(in_srgb,var(--color-accent)_80%,transparent)] hover:-translate-y-px hover:shadow-[0_14px_30px_-10px_color-mix(in_srgb,var(--color-accent)_85%,transparent)]",
+    "bg-accent text-accent-ink hover:shadow-[0_10px_24px_-12px_color-mix(in_srgb,var(--color-accent)_80%,transparent)]",
   ghost:
-    "bg-transparent text-text border-border-strong hover:-translate-y-px hover:bg-card hover:border-dim",
+    "bg-transparent text-text border-border-strong hover:bg-card hover:border-dim",
 };
 
 type BaseProps = {

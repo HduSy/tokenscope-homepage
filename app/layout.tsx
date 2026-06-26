@@ -115,16 +115,9 @@ export default function RootLayout({
       className={`${ibmSans.variable} ${ibmMono.variable} ${spaceGrotesk.variable}`}
     >
       <head>
-        {/* Phosphor Icons (regular + bold) — UI glyphs only. The brand mark
-            is the app's own SVG, not a Phosphor icon. */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
-        />
+        {/* UI icons are inlined as SVG paths via <Icon/> (components/Icon.tsx)
+            — no external icon-font stylesheet, so nothing in <head> blocks
+            first paint on icon account. */}
         <ThemeInit />
         <script
           type="application/ld+json"
