@@ -3,14 +3,19 @@ import { BackToTop } from "./BackToTop";
 // Bottom slab: giant "Token" outlined + "scope" filled in accent green —
 // emphasises the unique half of the brand the same way the marketing copy
 // does throughout the page. The wordmark SVG is full-bleed and fills the
-// whole slab height, so the back-to-top link sits in its own row ABOVE the
-// wordmark (right-aligned to the content column) instead of floating over
-// the letters — otherwise it covers "scope", especially on mobile.
+// whole slab height, so on mobile the back-to-top link sits in its own row
+// ABOVE the wordmark (floating over the letters would cover "scope"). On
+// desktop (>=md) it floats bottom-right like the original signoff.
 
 export function BrandSignoff() {
   return (
-    <div className="bg-bg">
-      <div className="mx-auto flex max-w-[1200px] justify-end px-6 pt-8 sm:pt-10">
+    <div className="relative bg-bg">
+      {/* Mobile: above the wordmark so it never overlaps "scope". */}
+      <div className="mx-auto flex max-w-[1200px] justify-end px-6 pt-8 sm:pt-10 md:hidden">
+        <BackToTop />
+      </div>
+      {/* Desktop (>=md): float bottom-right like the original signoff. */}
+      <div className="absolute bottom-5 right-6 hidden md:block">
         <BackToTop />
       </div>
       <div aria-hidden="true" className="select-none overflow-hidden">

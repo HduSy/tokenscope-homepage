@@ -4,7 +4,8 @@
 // same inline-style approach — keeps the panel pixel-identical to the real
 // macOS app.
 
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
+import { useInView } from "../useInView";
 import {
   Theme,
   ModelStat,
@@ -260,20 +261,30 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
   );
 }
 
-export function BarList({ items, theme, accent, limit = 5 }:
-  { items: NamedCount[]; theme: Theme; accent?: string; limit?: number }) {
+export function BarList({ items, theme, accent, limit = 5, animate = false }:
+  { items: NamedCount[]; theme: Theme; accent?: string; limit?: number; animate?: boolean }) {
   const t = theme; accent = accent || t.accent;
   const [open, setOpen] = useState(false);
   const shown = items.slice(0, open ? items.length : limit);
   const max = items.reduce((m, i) => Math.max(m, i.count), 0) || 1;
   const more = items.length - shown.length;
+  // `animate` is opt-in: grow each bar from 0 once the list scrolls into view.
+  // The hero Panel doesn't pass it, so it stays identical. useInView snaps to
+  // in-view under prefers-reduced-motion, so bars render at full width.
+  const { ref, inView } = useInView<HTMLDivElement>();
+  const grow = animate && inView;
   return (
-    <div>
+    <div ref={ref}>
       {shown.map((it, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 9, padding: "3px 0" }}>
           <span style={{ font: `500 10.5px ${t.mono}`, color: t.text, flex: "0 0 134px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.name}</span>
           <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.gridLine, overflow: "hidden" }}>
-            <div style={{ width: `${(it.count / max) * 100}%`, height: "100%", background: accent, borderRadius: 3 }} />
+            <div style={{
+              width: `${animate && !grow ? 0 : (it.count / max) * 100}%`,
+              height: "100%", background: accent, borderRadius: 3,
+              transition: animate ? "width .7s cubic-bezier(0.16,1,0.3,1)" : undefined,
+              transitionDelay: animate ? `${i * 70}ms` : undefined,
+            }} />
           </div>
           <span style={{ font: `600 10.5px ${t.mono}`, color: t.dim, flex: "0 0 auto", minWidth: 30, textAlign: "right" }}>{fmtInt(it.count)}</span>
         </div>
@@ -300,12 +311,14 @@ function ramp(accent: string, lvl: number, gridLine: string, card: string) {
   return `color-mix(in srgb, ${accent} ${Math.round(op * 100)}%, ${card})`;
 }
 
-export function Heatmap({ days, theme, accent, gap = 2 }:
-  { days: HeatDay[]; theme: Theme; accent?: string; gap?: number }) {
+export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
+  { days: HeatDay[]; theme: Theme; accent?: string; gap?: number; animate?: boolean }) {
   const t = theme; accent = accent || t.accent;
   const [hi, setHi] = useState<HeatDay | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
-  const wrapRef = useRef<HTMLDivElement>(null);
+  // `animate` is opt-in: stagger cells in left-to-right once in view. Reuses
+  // the wrapper as the observer target. Snaps to visible under reduced-motion.
+  const { ref: wrapRef, inView } = useInView<HTMLDivElement>();
   const weeks: (HeatDay | null)[][] = [];
   days.forEach((d) => {
     const dow = new Date(d.date + "T00:00:00").getDay();
@@ -351,8 +364,16 @@ export function Heatmap({ days, theme, accent, gap = 2 }:
               <div key={di}
                 onMouseEnter={d ? (e) => onCell(d, e) : undefined}
                 onMouseLeave={() => setHi(null)}
-                style={{ width: "100%", aspectRatio: "1 / 1", borderRadius: 2,
-                  background: d ? ramp(accent!, d.level, t.gridLine, t.card) : "transparent" }} />
+                style={{
+                  width: "100%", aspectRatio: "1 / 1", borderRadius: 2,
+                  background: d ? ramp(accent!, d.level, t.gridLine, t.card) : "transparent",
+                  ...(animate ? {
+                    opacity: inView ? 1 : 0,
+                    transform: inView ? "scale(1)" : "scale(0.35)",
+                    transition: "opacity .35s ease, transform .35s cubic-bezier(0.16,1,0.3,1)",
+                    transitionDelay: `${wi * 16}ms`,
+                  } : {}),
+                }} />
             ))}
           </div>
         ))}

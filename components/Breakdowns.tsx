@@ -12,8 +12,10 @@ import {
   MiniStat,
   Sparkline,
 } from "./tokenscope/charts";
-import { DEMO_DASHBOARD, fmtInt, pct, TH, type Theme } from "@/lib/tokenscope-data";
+import { DEMO_DASHBOARD, fmtInt, TH, type Theme } from "@/lib/tokenscope-data";
 import { Reveal } from "./Reveal";
+import { useCountUp } from "./useCountUp";
+import { useInView } from "./useInView";
 import { useTheme } from "./useTheme";
 
 // Panel-style uppercase mini label, inline-styled so it matches the rest of
@@ -56,7 +58,10 @@ export function Breakdowns() {
   const week = DEMO_DASHBOARD.week;
   const M = week.metrics;
   const costModels = week.models.filter((m) => m.cost > 0);
-  const cacheShare = pct(M.cacheTokens, M.totalTokens);
+  // Count the cache % up from 0 when its tile scrolls into view.
+  const cachePctNum = Math.round((M.cacheTokens / M.totalTokens) * 100);
+  const { ref: cacheRef, inView: cacheInView } = useInView<HTMLDivElement>();
+  const cacheCount = useCountUp(cachePctNum, cacheInView);
 
   return (
     <section id="breakdowns" className="pb-16 sm:pb-24">
@@ -135,7 +140,7 @@ export function Breakdowns() {
                   <ListTotal t={t} calls={M.mcpCalls} count={M.servers} unit="servers" />
                 </div>
                 {week.mcp.length > 0 ? (
-                  <BarList items={week.mcp} theme={t} accent={t.accent} />
+                  <BarList items={week.mcp} theme={t} accent={t.accent} animate />
                 ) : (
                   <div style={{ font: `500 11px ${t.mono}`, color: t.faint, padding: "2px 0" }}>
                     No MCP calls this week
@@ -158,7 +163,7 @@ export function Breakdowns() {
                   <ListTotal t={t} calls={M.skillCalls} count={M.skills} unit="skills" />
                 </div>
                 {week.skills.length > 0 ? (
-                  <BarList items={week.skills} theme={t} accent={t.accent} />
+                  <BarList items={week.skills} theme={t} accent={t.accent} animate />
                 ) : (
                   <div style={{ font: `500 11px ${t.mono}`, color: t.faint, padding: "2px 0" }}>
                     No skill calls this week
@@ -185,7 +190,7 @@ export function Breakdowns() {
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
               Daily token volume across the last twelve months.
             </div>
-            <Heatmap days={DEMO_DASHBOARD.heatmap} theme={t} accent={t.accent} />
+            <Heatmap days={DEMO_DASHBOARD.heatmap} theme={t} accent={t.accent} animate />
           </Reveal>
 
           {/* Cache % — sits next to the heatmap on the same row (5 cols). */}
@@ -194,17 +199,19 @@ export function Breakdowns() {
             delayIndex={3}
             className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
           >
-            <h3 className="mb-1 text-[17px] font-semibold">Cache changes everything</h3>
-            <div
-              className="font-mono font-semibold leading-none tracking-[-0.03em] text-accent"
-              style={{ fontSize: "clamp(56px,9vw,84px)" }}
-            >
-              {cacheShare}
-              <span className="ml-0.5 text-[0.42em] text-dim">% cached</span>
-            </div>
-            <div className="mt-4.5 font-mono text-[11px] leading-[1.5] text-faint">
-              Heavily cached days show huge token counts but a modest bill. Cache hits are billed
-              at their own cheaper rate, not as fresh input.
+            <div ref={cacheRef}>
+              <h3 className="mb-1 text-[17px] font-semibold">Cache changes everything</h3>
+              <div
+                className="font-mono font-semibold leading-none tracking-[-0.03em] text-accent"
+                style={{ fontSize: "clamp(56px,9vw,84px)" }}
+              >
+                {Math.round(cacheCount)}
+                <span className="ml-0.5 text-[0.42em] text-dim">% cached</span>
+              </div>
+              <div className="mt-4.5 font-mono text-[11px] leading-[1.5] text-faint">
+                Heavily cached days show huge token counts but a modest bill. Cache hits are billed
+                at their own cheaper rate, not as fresh input.
+              </div>
             </div>
           </Reveal>
         </div>
