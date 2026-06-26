@@ -164,8 +164,8 @@ function PanelThemeToggle({ dark, theme, onToggle }: { dark: boolean; theme: The
   );
 }
 
-export function Panel({ dash, dark, onToggleTheme, openGen, active }:
-  { dash: Dashboard; dark: boolean; onToggleTheme: () => void; openGen: number; active: boolean }) {
+export function Panel({ dash, dark, onToggleTheme, openGen, active, compact = false }:
+  { dash: Dashboard; dark: boolean; onToggleTheme: () => void; openGen: number; active: boolean; compact?: boolean }) {
   const t = TH[dark ? "dark" : "light"];
   const [period, setPeriod] = useState<"Day" | "Week" | "Month">("Week");
   const P: PeriodReport = period === "Day" ? dash.day : period === "Month" ? dash.month : dash.week;
@@ -184,10 +184,12 @@ export function Panel({ dash, dark, onToggleTheme, openGen, active }:
   return (
     // Embedded version: the outer 100vh scroller from the app is replaced
     // with a fixed-height card sized to fit the hero column. The inner card
-    // markup is otherwise identical.
+    // markup is otherwise identical. `compact` truncates the panel after
+    // "Tokens by model" — matches the original landing.html hero scope.
     <div style={{ width: "100%", maxWidth: 384, justifySelf: "center", fontFamily: t.ui }}>
       <div className="om-scroll" style={{
-        width: "100%", maxHeight: 640, overflowY: "auto",
+        width: "100%",
+        ...(compact ? {} : { maxHeight: 640, overflowY: "auto" as const }),
         borderRadius: 12, background: dark ? "#1f2226" : "#ffffff",
         border: `1px solid ${dark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)"}`,
         padding: 0, color: t.text,
@@ -208,7 +210,10 @@ export function Panel({ dash, dark, onToggleTheme, openGen, active }:
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Segmented value={period} theme={t} onSelect={(v) => setPeriod(v as "Day" | "Week" | "Month")} />
-            <PanelThemeToggle dark={dark} theme={t} onToggle={onToggleTheme} />
+            {/* Hide the panel-internal theme toggle in compact mode — the page
+                nav already has one, and the original landing.html panel didn't
+                include this control. */}
+            {!compact && <PanelThemeToggle dark={dark} theme={t} onToggle={onToggleTheme} />}
           </div>
         </div>
         <div style={{ padding: "14px 15px 15px" }}>
@@ -237,56 +242,58 @@ export function Panel({ dash, dark, onToggleTheme, openGen, active }:
           <div style={{ marginBottom: 4 }}><Label t={t}>Tokens by model</Label></div>
           {tokenModels.length === 0 && <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint, padding: "4px 0" }}>No usage in this period</div>}
           {tokenModels.map((m, i) => <ModelRow key={i} m={m} max={maxM} theme={t} share={tokenShares[i]} />)}
-          <SectionRule t={t} m="10px 0 10px" />
-          <div style={{ marginBottom: 8 }}><Label t={t}>Cost by model</Label></div>
-          {costModels.length > 0
-            ? <CostDonut models={costModels} theme={t} size={100} thickness={15} />
-            : <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint }}>—</div>}
-          {unpricedModels.length > 0 && (
-            <div style={{ marginTop: 9, font: `500 9.5px/1.5 ${t.mono}`, color: t.faint }}>
-              {unpricedModels.length} model{unpricedModels.length > 1 ? "s" : ""} without pricing data (cost not counted):{" "}
-              <span style={{ color: t.dim }}>{unpricedModels.map((m) => m.name).join(", ")}</span>
+          {!compact && <>
+            <SectionRule t={t} m="10px 0 10px" />
+            <div style={{ marginBottom: 8 }}><Label t={t}>Cost by model</Label></div>
+            {costModels.length > 0
+              ? <CostDonut models={costModels} theme={t} size={100} thickness={15} />
+              : <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint }}>—</div>}
+            {unpricedModels.length > 0 && (
+              <div style={{ marginTop: 9, font: `500 9.5px/1.5 ${t.mono}`, color: t.faint }}>
+                {unpricedModels.length} model{unpricedModels.length > 1 ? "s" : ""} without pricing data (cost not counted):{" "}
+                <span style={{ color: t.dim }}>{unpricedModels.map((m) => m.name).join(", ")}</span>
+              </div>
+            )}
+            <SectionRule t={t} m="12px 0 12px" />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <MiniStat label="Requests" value={fmtInt(M.requests)} sub={`${M.sessions} sessions`} theme={t}>
+                <Sparkline values={P.reqTrend.length ? P.reqTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
+              </MiniStat>
+              <MiniStat label="Cost trend" value={`$${M.cost.toFixed(2)}`} sub={trendSub} theme={t} accent={t.accent}>
+                <Sparkline values={P.costTrend.length ? P.costTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
+              </MiniStat>
             </div>
-          )}
-          <SectionRule t={t} m="12px 0 12px" />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <MiniStat label="Requests" value={fmtInt(M.requests)} sub={`${M.sessions} sessions`} theme={t}>
-              <Sparkline values={P.reqTrend.length ? P.reqTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
-            </MiniStat>
-            <MiniStat label="Cost trend" value={`$${M.cost.toFixed(2)}`} sub={trendSub} theme={t} accent={t.accent}>
-              <Sparkline values={P.costTrend.length ? P.costTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
-            </MiniStat>
-          </div>
-          {M.servers > 0 && (
-            <>
-              <SectionRule t={t} />
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
-                <Label t={t}>MCP calls</Label>
-                <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.mcpCalls)}</span> · {M.servers} servers</span>
-              </div>
-              {P.mcp.length > 0
-                ? <BarList key={period} items={P.mcp} theme={t} accent={t.accent} />
-                : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No MCP calls in this period</div>}
-            </>
-          )}
-          {M.skills > 0 && (
-            <>
-              <SectionRule t={t} />
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
-                <Label t={t}>Skill calls</Label>
-                <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.skillCalls)}</span> · {M.skills} skills</span>
-              </div>
-              {P.skills.length > 0
-                ? <BarList key={period} items={P.skills} theme={t} accent={t.accent} />
-                : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No skill calls in this period</div>}
-            </>
-          )}
-          <SectionRule t={t} />
-          <div style={{ marginBottom: 9 }}><Label t={t}>Daily activity</Label></div>
-          <Heatmap days={dash.heatmap} theme={t} accent={t.accent} />
-          <div style={{ marginTop: 12, font: `500 8.5px ${t.mono}`, color: t.faint, textAlign: "center" }}>
-            Est. cost via models.dev / LiteLLM · estimate
-          </div>
+            {M.servers > 0 && (
+              <>
+                <SectionRule t={t} />
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
+                  <Label t={t}>MCP calls</Label>
+                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.mcpCalls)}</span> · {M.servers} servers</span>
+                </div>
+                {P.mcp.length > 0
+                  ? <BarList key={period} items={P.mcp} theme={t} accent={t.accent} />
+                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No MCP calls in this period</div>}
+              </>
+            )}
+            {M.skills > 0 && (
+              <>
+                <SectionRule t={t} />
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
+                  <Label t={t}>Skill calls</Label>
+                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.skillCalls)}</span> · {M.skills} skills</span>
+                </div>
+                {P.skills.length > 0
+                  ? <BarList key={period} items={P.skills} theme={t} accent={t.accent} />
+                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No skill calls in this period</div>}
+              </>
+            )}
+            <SectionRule t={t} />
+            <div style={{ marginBottom: 9 }}><Label t={t}>Daily activity</Label></div>
+            <Heatmap days={dash.heatmap} theme={t} accent={t.accent} />
+            <div style={{ marginTop: 12, font: `500 8.5px ${t.mono}`, color: t.faint, textAlign: "center" }}>
+              Est. cost via models.dev / LiteLLM · estimate
+            </div>
+          </>}
         </div>
       </div>
     </div>

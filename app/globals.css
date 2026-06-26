@@ -120,3 +120,15 @@ h3 {
     animation: none !important;
   }
 }
+
+/* Hide the scrollbar on Tokenscope's panel scroll container (used by the
+   embedded hero panel and the full app when shipped in Tauri). Content is
+   still scrollable via wheel/trackpad. */
+.om-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge / IE */
+}
+.om-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

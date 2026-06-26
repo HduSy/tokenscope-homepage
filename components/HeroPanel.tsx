@@ -44,6 +44,7 @@ export function HeroPanel() {
         onToggleTheme={toggle}
         openGen={openGen}
         active={active}
+        compact
       />
     </div>
   );
