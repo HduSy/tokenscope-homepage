@@ -140,3 +140,34 @@ h3 {
   width: 0;
   height: 0;
 }
+
+/* Tailwind v4 dropped the v3 preflight rule that made <button> hand-cursor
+   on hover. Put it back so every clickable button across the page gets the
+   expected pointer affordance; disabled buttons get not-allowed instead. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* Theme-switch circular reveal via the View Transitions API. The browser's
+   default crossfade is replaced by a clip-path animation driven from the
+   theme-toggle button's centre — see components/ThemeToggle.tsx. The new
+   layer sits on top of the old one and clips from radius 0 outwards, so the
+   new theme reveals as a growing disc. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+::view-transition-new(root) {
+  z-index: 1;
+}

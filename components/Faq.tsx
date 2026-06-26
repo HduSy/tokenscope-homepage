@@ -3,14 +3,9 @@
 import { useState } from "react";
 import { Reveal } from "./Reveal";
 
-// Default-collapsed FAQ. Native <details> snaps open/closed — switching to a
-// React useState + grid-template-rows trick gives a real height animation:
-//
-//   grid container with grid-template-rows: 0fr (closed) / 1fr (open)
-//   inner overflow: hidden child so the answer clips while the row is 0fr
-//
-// Browsers that don't transition fractional grid track sizes fall back to a
-// snap, which is no worse than what <details> gave us.
+// Default-collapsed FAQ. Single-open accordion: parent owns the openIndex,
+// each item is a controlled child — clicking another row closes whatever
+// was open. Animation uses the grid-template-rows 0fr ↔ 1fr trick.
 
 type Faq = { q: string; a: React.ReactNode };
 
@@ -106,13 +101,18 @@ const FAQS: Faq[] = [
   },
 ];
 
-function FaqItem({ q, a, first }: Faq & { first: boolean }) {
-  const [open, setOpen] = useState(false);
+function FaqItem({
+  q,
+  a,
+  first,
+  open,
+  onToggle,
+}: Faq & { first: boolean; open: boolean; onToggle: () => void }) {
   return (
     <div className={first ? "" : "border-t border-border"}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={onToggle}
         aria-expanded={open}
         className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-grid-line"
       >
@@ -125,16 +125,10 @@ function FaqItem({ q, a, first }: Faq & { first: boolean }) {
         />
       </button>
       <div
-        // Animate the row track from 0fr → 1fr. The inner overflow:hidden div
-        // clips the answer while the track is zero, then the grid expands
-        // smoothly to its content's natural height.
         className="grid transition-[grid-template-rows] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          {/* pt-3 keeps the answer from crashing into the button's own bottom
-              padding; px-6 / pb-5 mirror the button's horizontal padding +
-              the panel's bottom rhythm. */}
           <div className="max-w-[70ch] px-6 pt-3 pb-5 text-[14.5px] leading-[1.7] text-dim">
             {a}
           </div>
@@ -145,6 +139,10 @@ function FaqItem({ q, a, first }: Faq & { first: boolean }) {
 }
 
 export function Faq() {
+  // Parent owns which row is open so opening one auto-closes the rest.
+  // null = all collapsed (the default).
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
     <section id="faq" className="py-16 sm:py-24">
       <div className="mx-auto max-w-[1200px] px-6">
@@ -162,7 +160,14 @@ export function Faq() {
           className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card"
         >
           {FAQS.map((item, i) => (
-            <FaqItem key={i} q={item.q} a={item.a} first={i === 0} />
+            <FaqItem
+              key={i}
+              q={item.q}
+              a={item.a}
+              first={i === 0}
+              open={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+            />
           ))}
         </Reveal>
       </div>

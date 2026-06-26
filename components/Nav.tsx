@@ -1,17 +1,11 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BrandMark } from "./BrandMark";
 import { Button } from "./Button";
 import { ThemeToggle } from "./ThemeToggle";
 
-// Sticky nav with two states:
-// - Top of page  → full-width glass bar with bottom border.
-// - Scrolled     → the bar background fades away and the inner container
-//                  shrinks into a floating glass pill centred on the page.
-// The whole thing is a single sticky <header>; only inline styles change
-// between states so width / radius / shadow can all transition together.
+// Sticky glass nav. Server-rendered shell; the only client island is
+// <ThemeToggle/>. Glass is more transparent now (55% instead of 82%) so the
+// page content reads through it as you scroll.
 
 const links = [
   { href: "#breakdowns", label: "Breakdowns" },
@@ -21,54 +15,17 @@ const links = [
   { href: "#install", label: "Install" },
 ];
 
-const GLASS = "color-mix(in srgb, var(--color-bg) 82%, transparent)";
-const BLUR = "saturate(160%) blur(12px)";
-
 export function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header
-      // Outer bar: glass at top, transparent once scrolled (the inner pill
-      // takes over the glass). transition covers background + border colour
-      // so the bar dissolves smoothly into the page.
-      className="sticky top-0 z-50 transition-[background,border-color,padding] duration-300 ease-out"
+    <nav
+      className="sticky top-0 z-50 border-b border-border backdrop-blur-md"
       style={{
-        background: scrolled ? "transparent" : GLASS,
-        backdropFilter: scrolled ? undefined : BLUR,
-        WebkitBackdropFilter: scrolled ? undefined : BLUR,
-        borderBottom: scrolled
-          ? "1px solid transparent"
-          : "1px solid var(--color-border)",
-        paddingTop: scrolled ? 12 : 0,
-        paddingBottom: scrolled ? 4 : 0,
+        background: "color-mix(in srgb, var(--color-bg) 55%, transparent)",
+        WebkitBackdropFilter: "saturate(160%) blur(14px)",
+        backdropFilter: "saturate(160%) blur(14px)",
       }}
     >
-      <div
-        // Inner container: stays sized to the page max-width at the top,
-        // shrinks into a pill with backdrop-blur + shadow once scrolled.
-        className="mx-auto flex h-14 items-center justify-between gap-4 transition-all duration-300 ease-out"
-        style={{
-          maxWidth: scrolled ? 920 : 1200,
-          paddingLeft: scrolled ? 16 : 24,
-          paddingRight: scrolled ? 12 : 24,
-          borderRadius: scrolled ? 9999 : 0,
-          background: scrolled ? GLASS : "transparent",
-          backdropFilter: scrolled ? BLUR : undefined,
-          WebkitBackdropFilter: scrolled ? BLUR : undefined,
-          border: scrolled
-            ? "1px solid var(--color-border-strong)"
-            : "1px solid transparent",
-          boxShadow: scrolled ? "0 12px 30px -12px rgba(0,0,0,0.4)" : "none",
-        }}
-      >
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         <Link
           href="#top"
           aria-label="Tokenscope home"
@@ -106,6 +63,6 @@ export function Nav() {
           </Button>
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
