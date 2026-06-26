@@ -102,9 +102,8 @@ const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
   }));
 
 // ── MCP / Skill base lists (week totals); scale by period.mcpCalls etc. ─
-// Top 5 only — a real Claude CLI user invokes each tool a handful of times
-// per week, not hundreds. Numbers scale up for Month / down for Day via
-// scaleCalls below.
+// Top 5 only. Each list sums to 10 calls / week — a realistic Claude CLI
+// hobbyist load. Numbers scale up for Month / down for Day via scaleCalls.
 //
 // MCP server names match the identifiers from each project's official MCP
 // server, as they'd appear in a user's claude config:
@@ -114,18 +113,18 @@ const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
 //   context7       — Upstash's @upstash/context7-mcp
 //   firecrawl      — Mendable's firecrawl-mcp-server
 const MCP_BASE: NamedCount[] = [
-  { name: "github", count: 9 },
-  { name: "playwright", count: 8 },
-  { name: "figma-dev-mode", count: 7 },
-  { name: "context7", count: 6 },
-  { name: "firecrawl", count: 5 },
+  { name: "github", count: 3 },
+  { name: "playwright", count: 2 },
+  { name: "figma-dev-mode", count: 2 },
+  { name: "context7", count: 2 },
+  { name: "firecrawl", count: 1 },
 ];
 const SKILL_BASE: NamedCount[] = [
-  { name: "find-skills", count: 10 },
-  { name: "skill-creator", count: 8 },
-  { name: "design-taste-frontend", count: 7 },
-  { name: "seo-audit", count: 6 },
-  { name: "humanizer", count: 5 },
+  { name: "find-skills", count: 3 },
+  { name: "skill-creator", count: 2 },
+  { name: "design-taste-frontend", count: 2 },
+  { name: "seo-audit", count: 2 },
+  { name: "humanizer", count: 1 },
 ];
 
 function scaleCalls(list: NamedCount[], periodTotal: number): NamedCount[] {
@@ -177,23 +176,23 @@ function splitMetrics(m: DesignMetrics): Metrics {
 
 const DAY_DM: DesignMetrics = {
   totalTokens: 1.94, inputTokens: 1.27, outputTokens: 0.67, cost: 7.2,
-  // Realistic Claude CLI daily activity: ~1-2 invocations of a couple of
-  // tools, a handful of skill calls. Same 5 servers / skills are installed
-  // every period — the user's setup doesn't grow within a day.
-  mcpCalls: 7, skillCalls: 8, requests: 441, sessions: 23,
+  // Realistic Claude CLI daily activity: a couple of tool invocations and
+  // a couple of skill calls. Same 5 servers / skills are installed every
+  // period — the user's setup doesn't grow within a day.
+  mcpCalls: 2, skillCalls: 2, requests: 441, sessions: 23,
   deltaTokens: -0.18, deltaCost: -0.12, servers: 5, skills: 5,
 };
 const WEEK_DM: DesignMetrics = {
   totalTokens: 12.4, inputTokens: 8.13, outputTokens: 4.27, cost: 46.1,
   // Matches the sum of MCP_BASE / SKILL_BASE so the list bars and the
   // header total agree.
-  mcpCalls: 35, skillCalls: 36, requests: 2847, sessions: 143,
+  mcpCalls: 10, skillCalls: 10, requests: 2847, sessions: 143,
   deltaTokens: 0.14, deltaCost: -0.06, servers: 5, skills: 5,
 };
 const MONTH_DM: DesignMetrics = {
   totalTokens: 27.5, inputTokens: 18.1, outputTokens: 9.4, cost: 101.3,
   // ~4× the weekly baseline.
-  mcpCalls: 142, skillCalls: 148, requests: 11680, sessions: 602,
+  mcpCalls: 40, skillCalls: 40, requests: 11680, sessions: 602,
   deltaTokens: 0.11, deltaCost: 0.09, servers: 5, skills: 5,
 };
 
