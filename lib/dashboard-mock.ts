@@ -105,12 +105,20 @@ const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
 // Top 5 only — a real Claude CLI user invokes each tool a handful of times
 // per week, not hundreds. Numbers scale up for Month / down for Day via
 // scaleCalls below.
+//
+// MCP server names match the identifiers from each project's official MCP
+// server, as they'd appear in a user's claude config:
+//   github         — github.com/github/github-mcp-server
+//   playwright     — Microsoft's @playwright/mcp
+//   figma-dev-mode — Figma's Dev Mode MCP Server
+//   context7       — Upstash's @upstash/context7-mcp
+//   firecrawl      — Mendable's firecrawl-mcp-server
 const MCP_BASE: NamedCount[] = [
-  { name: "filesystem", count: 9 },
-  { name: "github", count: 8 },
-  { name: "memory", count: 7 },
-  { name: "postgres", count: 6 },
-  { name: "fetch", count: 5 },
+  { name: "github", count: 9 },
+  { name: "playwright", count: 8 },
+  { name: "figma-dev-mode", count: 7 },
+  { name: "context7", count: 6 },
+  { name: "firecrawl", count: 5 },
 ];
 const SKILL_BASE: NamedCount[] = [
   { name: "pdf-reader", count: 10 },
