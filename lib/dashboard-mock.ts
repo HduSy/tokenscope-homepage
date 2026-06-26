@@ -121,11 +121,11 @@ const MCP_BASE: NamedCount[] = [
   { name: "firecrawl", count: 5 },
 ];
 const SKILL_BASE: NamedCount[] = [
-  { name: "pdf-reader", count: 10 },
-  { name: "deck-builder", count: 8 },
-  { name: "image-gen", count: 7 },
-  { name: "web-search", count: 6 },
-  { name: "code-runner", count: 5 },
+  { name: "find-skills", count: 10 },
+  { name: "skill-creator", count: 8 },
+  { name: "design-taste-frontend", count: 7 },
+  { name: "seo-audit", count: 6 },
+  { name: "humanizer", count: 5 },
 ];
 
 function scaleCalls(list: NamedCount[], periodTotal: number): NamedCount[] {
