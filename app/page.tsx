@@ -1,4 +1,5 @@
 import { Breakdowns } from "@/components/Breakdowns";
+import { BrandSignoff } from "@/components/BrandSignoff";
 import { FinalCta } from "@/components/FinalCta";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
@@ -18,6 +19,7 @@ export default function HomePage() {
       <InstallSection />
       <FinalCta />
       <Footer />
+      <BrandSignoff />
     </>
   );
 }
