@@ -23,6 +23,7 @@ import {
   CostDonut,
   BarList,
   Heatmap,
+  ModelRow,
 } from "./charts";
 
 // Count up to `target`. Restarts from 0 whenever `resetKey` changes (popover
@@ -80,23 +81,6 @@ function sharePcts(values: number[]): number[] {
     .slice(0, left)
     .forEach(({ i }) => (units[i] += 1));
   return units.map((u) => u / 10);
-}
-
-function ModelRow({ m, max, theme, share }: { m: ModelStat; max: number; theme: Theme; share: number }) {
-  const pctStr = share % 1 === 0 ? share.toFixed(0) : share.toFixed(1);
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "5px 0" }}>
-      <span style={{ width: 7, height: 7, borderRadius: 2, background: m.color, flex: "0 0 auto" }} />
-      <div style={{ minWidth: 0, flex: "0 0 118px" }}>
-        <div style={{ font: `500 11.5px ${theme.ui}`, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.name}</div>
-      </div>
-      <div style={{ flex: 1, height: 5, borderRadius: 3, background: theme.gridLine, overflow: "hidden" }}>
-        <div style={{ width: `${(m.tokens / max) * 100}%`, height: "100%", background: m.color, borderRadius: 3 }} />
-      </div>
-      <span style={{ font: `500 10.5px ${theme.mono}`, color: theme.dim, flex: "0 0 auto", width: 42, textAlign: "right" }}>{fmtTokens(m.tokens)}</span>
-      <span style={{ font: `600 10.5px ${theme.mono}`, color: theme.text, flex: "0 0 auto", width: 40, textAlign: "right" }}>{pctStr}%</span>
-    </div>
-  );
 }
 
 function MiniStat({ label, value, sub, theme, accent, children }:
