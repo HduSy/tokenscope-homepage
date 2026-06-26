@@ -66,6 +66,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    // Google Search Console ownership verification.
+    google: "NWMthZQj6LXDk7_sNjHI6zOdf9-EzACV82MCdAi9Uk8",
+  },
 };
 
 export const viewport: Viewport = {

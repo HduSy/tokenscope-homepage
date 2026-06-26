@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { setLenis } from "@/lib/lenis";
 
 // Page-wide smooth scroll. Lenis intercepts wheel + touch deltas and lerps
 // the document scroll position toward them, so trackpad / mouse-wheel /
@@ -26,6 +27,9 @@ export function SmoothScroll() {
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    // Expose the instance so LogoLink / BackToTop can drive it via
+    // scrollToTop() instead of fighting it with window.scrollTo.
+    setLenis(lenis);
 
     let rafId = 0;
     const raf = (time: number) => {
@@ -36,6 +40,7 @@ export function SmoothScroll() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      setLenis(null);
       lenis.destroy();
     };
   }, []);

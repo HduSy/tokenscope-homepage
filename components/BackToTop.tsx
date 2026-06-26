@@ -1,15 +1,15 @@
 "use client";
 
+import { scrollToTop } from "@/lib/lenis";
 import { Icon } from "./Icon";
 
 // Small "Back to top ↑" affordance pinned to the bottom-right of the
-// BrandSignoff slab. window.scrollTo with behavior:smooth defers to Lenis
-// when it's active (Lenis intercepts the native scroll API) and falls back
-// to the browser's CSS-driven smooth scroll otherwise.
+// BrandSignoff slab. Routes through Lenis's scrollTo (see lib/lenis.ts) so it
+// never races the smooth-scroll loop — one click always lands.
 
 export function BackToTop() {
   const onClick = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTop();
   };
   return (
     <button

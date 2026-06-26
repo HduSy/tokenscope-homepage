@@ -1,11 +1,12 @@
 "use client";
 
+import { scrollToTop } from "@/lib/lenis";
 import { BrandMark } from "./BrandMark";
 
-// Clicking the logo scrolls the page back to the top. Lenis hooks into the
-// standard scroll API, so window.scrollTo with smooth behaviour stays in
-// sync with the page-wide smooth-scroll. Falls back to instant on reduced
-// motion.
+// Clicking the logo scrolls back to the top via Lenis's own scrollTo — see
+// lib/lenis.ts for why window.scrollTo isn't used (it races with Lenis and
+// the first click can be eaten). Falls back to native instant scroll when
+// Lenis is off (reduced-motion mode).
 
 export function LogoLink() {
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -13,7 +14,7 @@ export function LogoLink() {
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    scrollToTop(!reduce);
   };
 
   return (
