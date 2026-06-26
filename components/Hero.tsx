@@ -1,5 +1,5 @@
+import { HeroPanel } from "./HeroPanel";
 import { InstallCtas } from "./InstallCtas";
-import { PanelPreview } from "./PanelPreview";
 
 // Hero: copy on the left, live panel preview on the right. Wrapped in a
 // relative container so the accent glow ::before sits behind both.
@@ -30,7 +30,7 @@ export function Hero() {
           </p>
           <InstallCtas className="mt-7" />
         </div>
-        <PanelPreview />
+        <HeroPanel />
       </div>
     </header>
   );
