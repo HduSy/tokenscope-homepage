@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
+/* Tailwind v4 design tokens — locked to the real Tokenscope app. Override the
+   same CSS variables under [data-theme="light"] to swap themes at runtime. */
+@theme {
+  --color-bg: #131619;
+  --color-bg-elev: #16191c;
+  --color-card: #1f2226;
+  --color-card-2: #1a1d20;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
+  --color-grid-line: rgba(255, 255, 255, 0.06);
+  --color-text: rgba(255, 255, 255, 0.94);
+  --color-dim: rgba(255, 255, 255, 0.52);
+  --color-faint: rgba(255, 255, 255, 0.34);
+  --color-accent: #27b06e;
+  --color-accent-soft: #5fcf9c;
+  --color-accent-ink: #06120c;
+  --color-delta-up: #e0795f;
+
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 24px 60px -28px rgba(0, 0, 0, 0.7);
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 40px 90px -36px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--color-border);
+}
+
+/* Light theme overrides — same variable names so all Tailwind utilities swap. */
+:root[data-theme="light"] {
+  --color-bg: #f3f5f2;
+  --color-bg-elev: #eef1ec;
+  --color-card: #ffffff;
+  --color-card-2: #f6f8f4;
+  --color-border: rgba(15, 22, 18, 0.1);
+  --color-border-strong: rgba(15, 22, 18, 0.16);
+  --color-grid-line: rgba(0, 0, 0, 0.07);
+  --color-text: rgba(17, 22, 19, 0.94);
+  --color-dim: rgba(17, 22, 19, 0.56);
+  --color-faint: rgba(17, 22, 19, 0.38);
+  --color-accent: #178a55;
+  --color-accent-soft: #8fd9b4;
+  --color-accent-ink: #ffffff;
+  --color-delta-up: #c8553a;
+
+  --shadow-card: 0 1px 2px rgba(15, 22, 18, 0.04),
+    0 18px 40px -26px rgba(15, 22, 18, 0.2);
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 30px 70px -34px rgba(15, 22, 18, 0.26), 0 0 0 1px var(--color-border);
+}
+
+/* The accent radial glow lives on a CSS variable because its colour swaps. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent-glow: radial-gradient(
+    60% 50% at 70% 12%,
+    rgba(39, 176, 110, 0.16),
+    transparent 70%
+  );
+}
+:root[data-theme="light"] {
+  --accent-glow: radial-gradient(
+    60% 50% at 70% 12%,
+    rgba(23, 138, 85, 0.12),
+    transparent 70%
+  );
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  font-weight: 600;
+}
+
+/* Scroll-reveal fade-in handled inside <Reveal /> — keep here so it doesn't
+   ship as a per-component style block. */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    animation: none !important;
+  }
 }
