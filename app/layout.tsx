@@ -69,6 +69,8 @@ export const metadata: Metadata = {
   verification: {
     // Google Search Console ownership verification.
     google: "NWMthZQj6LXDk7_sNjHI6zOdf9-EzACV82MCdAi9Uk8",
+    // Bing Webmaster Tools ownership verification.
+    other: { "msvalidate.01": "AB6E5DE3821D6902F37F222AEDC91131" },
   },
 };
 

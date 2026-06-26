@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Icon } from "./Icon";
 import { LogoLink } from "./LogoLink";
+import { ShareMenu } from "./ShareMenu";
 import { ThemeToggle } from "./ThemeToggle";
 
 // Sticky glass nav. Server-rendered shell; the client islands are
@@ -49,6 +50,7 @@ export function Nav() {
           >
             <Icon name="github-logo" size={17} />
           </a>
+          <ShareMenu />
           <ThemeToggle />
         </div>
       </div>

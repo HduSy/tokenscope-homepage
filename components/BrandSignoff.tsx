@@ -2,12 +2,17 @@ import { BackToTop } from "./BackToTop";
 
 // Bottom slab: giant "Token" outlined + "scope" filled in accent green —
 // emphasises the unique half of the brand the same way the marketing copy
-// does throughout the page. Wordmark stays aria-hidden; the back-to-top
-// button is in its own accessible layer pinned to the slab's bottom-right.
+// does throughout the page. The wordmark SVG is full-bleed and fills the
+// whole slab height, so the back-to-top link sits in its own row ABOVE the
+// wordmark (right-aligned to the content column) instead of floating over
+// the letters — otherwise it covers "scope", especially on mobile.
 
 export function BrandSignoff() {
   return (
-    <div className="relative bg-bg">
+    <div className="bg-bg">
+      <div className="mx-auto flex max-w-[1200px] justify-end px-6 pt-8 sm:pt-10">
+        <BackToTop />
+      </div>
       <div aria-hidden="true" className="select-none overflow-hidden">
         <svg
           viewBox="0 0 550 100"
@@ -39,9 +44,6 @@ export function BrandSignoff() {
             <tspan style={{ fill: "var(--color-accent)" }}>scope</tspan>
           </text>
         </svg>
-      </div>
-      <div className="absolute bottom-5 right-6">
-        <BackToTop />
       </div>
     </div>
   );
