@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
+  <!-- Same glyph as components/BrandMark.tsx, but with a filled dark
+       rounded square (instead of a stroked outline) so it stays legible
+       at 16x16 in the browser tab. -->
+  <rect width="14" height="14" rx="3.2" fill="#16191c"/>
+  <rect x="3" y="7.5" width="1.7" height="3.2" rx="0.6" fill="#27b06e"/>
+  <rect x="6.15" y="5" width="1.7" height="5.7" rx="0.6" fill="#27b06e"/>
+  <rect x="9.3" y="3" width="1.7" height="7.7" rx="0.6" fill="#27b06e"/>
+</svg>
