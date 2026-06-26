@@ -79,12 +79,12 @@ body {
   background-color: var(--color-bg);
   /* Subtle grid lines using the same --color-grid-line that panels use
      internally — keeps the whole page on one ambient background and
-     swaps along with the theme. 56px cell size keeps it visible but
-     unobtrusive at desktop and mobile widths. */
+     swaps along with the theme. 32px cell size = denser/lighter feel,
+     reads more as texture than as a draftsman's grid. */
   background-image:
     linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
-  background-size: 56px 56px;
+  background-size: 32px 32px;
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
