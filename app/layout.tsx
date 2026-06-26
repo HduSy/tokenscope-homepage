@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeInit } from "@/components/ThemeInit";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastHost } from "@/components/Toast";
 
 const ibmSans = IBM_Plex_Sans({
@@ -68,6 +69,7 @@ export default function RootLayout({
         <ThemeInit />
       </head>
       <body className="min-h-full antialiased">
+        <SmoothScroll />
         {children}
         <ToastHost />
       </body>

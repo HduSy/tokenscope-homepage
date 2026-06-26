@@ -1,14 +1,21 @@
+"use client";
+
+import { useState } from "react";
 import { Reveal } from "./Reveal";
 
-// Default-collapsed FAQ powered by native <details>. No client JS — works
-// before hydration, accessible by default, and the rotating "+" icon is a
-// pure CSS transform driven by the [open] attribute. Wrapped in one bg-card
-// panel so the inter-item dividers register against an opaque background
-// instead of the page's ambient grid.
+// Default-collapsed FAQ. Native <details> snaps open/closed — switching to a
+// React useState + grid-template-rows trick gives a real height animation:
+//
+//   grid container with grid-template-rows: 0fr (closed) / 1fr (open)
+//   inner overflow: hidden child so the answer clips while the row is 0fr
+//
+// Browsers that don't transition fractional grid track sizes fall back to a
+// snap, which is no worse than what <details> gave us.
 
 type Faq = { q: string; a: React.ReactNode };
 
-const code = "rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent-soft";
+const code =
+  "rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent-soft";
 
 const FAQS: Faq[] = [
   {
@@ -99,6 +106,41 @@ const FAQS: Faq[] = [
   },
 ];
 
+function FaqItem({ q, a, first }: Faq & { first: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={first ? "" : "border-t border-border"}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-grid-line"
+      >
+        <span className="text-[16.5px] font-medium text-text">{q}</span>
+        <i
+          className={`ph ph-plus text-[18px] transition-[transform,color] duration-300 ease-out ${
+            open ? "rotate-45 text-accent" : "text-dim"
+          }`}
+          aria-hidden
+        />
+      </button>
+      <div
+        // Animate the row track from 0fr → 1fr. The inner overflow:hidden div
+        // clips the answer while the track is zero, then the grid expands
+        // smoothly to its content's natural height.
+        className="grid transition-[grid-template-rows] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div className="max-w-[70ch] px-6 pb-5 text-[14.5px] leading-[1.7] text-dim">
+            {a}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Faq() {
   return (
     <section id="faq" className="py-16 sm:py-24">
@@ -117,25 +159,7 @@ export function Faq() {
           className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card"
         >
           {FAQS.map((item, i) => (
-            <details
-              key={i}
-              // [&_summary::-webkit-details-marker]:hidden hides the default
-              // disclosure triangle (WebKit/Safari). list-none + summary's
-              // ::marker rule below cover the rest. group-open rotates the
-              // "+" into an "x" without any JS.
-              className="group border-t border-border first:border-t-0 [&_summary::-webkit-details-marker]:hidden"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 transition-colors hover:bg-grid-line">
-                <span className="text-[16.5px] font-medium text-text">{item.q}</span>
-                <i
-                  className="ph ph-plus text-[18px] text-dim transition-transform duration-200 group-open:rotate-45 group-open:text-accent"
-                  aria-hidden
-                />
-              </summary>
-              <div className="max-w-[70ch] px-6 pb-5 text-[14.5px] leading-[1.7] text-dim">
-                {item.a}
-              </div>
-            </details>
+            <FaqItem key={i} q={item.q} a={item.a} first={i === 0} />
           ))}
         </Reveal>
       </div>
