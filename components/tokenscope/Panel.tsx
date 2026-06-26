@@ -173,7 +173,11 @@ export function Panel({ dash, dark, onToggleTheme, openGen, active, compact = fa
     <div style={{ width: "100%", maxWidth: 384, justifySelf: "center", fontFamily: t.ui }}>
       <div className="om-scroll" style={{
         width: "100%",
-        ...(compact ? {} : { maxHeight: 640, overflowY: "auto" as const }),
+        // overflow is the trigger that lets border-radius clip the sticky
+        // header's top corners and the last child's bottom corners. Non-compact
+        // keeps overflow-y auto so the panel matches the app exactly; compact
+        // doesn't need scrolling but still needs the clipping → overflow:hidden.
+        ...(compact ? { overflow: "hidden" as const } : { maxHeight: 640, overflowY: "auto" as const }),
         borderRadius: 12, background: dark ? "#1f2226" : "#ffffff",
         border: `1px solid ${dark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)"}`,
         padding: 0, color: t.text,
