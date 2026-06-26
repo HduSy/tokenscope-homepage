@@ -120,11 +120,11 @@ const MCP_BASE: NamedCount[] = [
   { name: "firecrawl", count: 1 },
 ];
 const SKILL_BASE: NamedCount[] = [
-  { name: "find-skills", count: 3 },
-  { name: "skill-creator", count: 2 },
+  { name: "find-skills", count: 4 },
+  { name: "skill-creator", count: 3 },
   { name: "design-taste-frontend", count: 2 },
   { name: "seo-audit", count: 2 },
-  { name: "humanizer", count: 1 },
+  { name: "vercel-react-best-practices", count: 1 },
 ];
 
 function scaleCalls(list: NamedCount[], periodTotal: number): NamedCount[] {
@@ -177,22 +177,23 @@ function splitMetrics(m: DesignMetrics): Metrics {
 const DAY_DM: DesignMetrics = {
   totalTokens: 1.94, inputTokens: 1.27, outputTokens: 0.67, cost: 7.2,
   // Realistic Claude CLI daily activity: a couple of tool invocations and
-  // a couple of skill calls. Same 5 servers / skills are installed every
-  // period — the user's setup doesn't grow within a day.
-  mcpCalls: 2, skillCalls: 2, requests: 441, sessions: 23,
+  // a couple of skill calls. Skill totals match the SKILL_BASE shape, MCP
+  // totals match MCP_BASE — they're intentionally different distributions
+  // so the two BarLists don't look like copies of each other.
+  mcpCalls: 2, skillCalls: 3, requests: 441, sessions: 23,
   deltaTokens: -0.18, deltaCost: -0.12, servers: 5, skills: 5,
 };
 const WEEK_DM: DesignMetrics = {
   totalTokens: 12.4, inputTokens: 8.13, outputTokens: 4.27, cost: 46.1,
-  // Matches the sum of MCP_BASE / SKILL_BASE so the list bars and the
-  // header total agree.
-  mcpCalls: 10, skillCalls: 10, requests: 2847, sessions: 143,
+  // Matches the sum of MCP_BASE (10) / SKILL_BASE (12) so the list bars
+  // and the header total agree.
+  mcpCalls: 10, skillCalls: 12, requests: 2847, sessions: 143,
   deltaTokens: 0.14, deltaCost: -0.06, servers: 5, skills: 5,
 };
 const MONTH_DM: DesignMetrics = {
   totalTokens: 27.5, inputTokens: 18.1, outputTokens: 9.4, cost: 101.3,
   // ~4× the weekly baseline.
-  mcpCalls: 40, skillCalls: 40, requests: 11680, sessions: 602,
+  mcpCalls: 40, skillCalls: 48, requests: 11680, sessions: 602,
   deltaTokens: 0.11, deltaCost: 0.09, servers: 5, skills: 5,
 };
 

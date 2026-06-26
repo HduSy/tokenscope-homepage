@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeInit } from "@/components/ThemeInit";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastHost } from "@/components/Toast";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 const ibmSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
@@ -27,14 +28,43 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Tokenscope — Claude CLI token usage, in your menu bar",
-  description:
-    "A macOS menu-bar app that shows your Claude CLI daily token count, estimated cost, and per-model, MCP, and Skill breakdown. Read-only, zero intrusion.",
+  // metadataBase makes every relative URL in the document (og:image, icons,
+  // canonical, etc.) resolve against the production domain.
+  metadataBase: new URL(SITE_URL),
+  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
+  applicationName: SITE_NAME,
+  authors: [{ name: "HduSy", url: "https://github.com/HduSy" }],
+  creator: "HduSy",
+  publisher: "HduSy",
+  keywords: [
+    "Tokenscope",
+    "Claude CLI",
+    "token usage",
+    "macOS menu bar",
+    "AI cost",
+    "MCP",
+    "Skills",
+  ],
   openGraph: {
-    title: "Tokenscope",
+    type: "website",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
     description:
       "See what your Claude CLI actually costs. Token usage, estimated cost, and per-model / MCP / Skill breakdown in your macOS menu bar.",
-    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_TAGLINE,
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -43,6 +73,35 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
+
+// JSON-LD structured data — schema.org/SoftwareApplication for the brew
+// install + GitHub release distribution. Inlined into <head> so it ships
+// in the static HTML for crawlers (Googlebot reads JSON-LD; other crawlers
+// pick it up from the same payload).
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
+  applicationCategory: "DeveloperApplication",
+  applicationSubCategory: "Developer Tools",
+  operatingSystem: "macOS",
+  license: "https://opensource.org/licenses/MIT",
+  downloadUrl: "https://github.com/HduSy/tokenscope/releases",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  author: {
+    "@type": "Person",
+    name: "HduSy",
+    url: "https://github.com/HduSy",
+  },
+  codeRepository: "https://github.com/HduSy/tokenscope",
+  programmingLanguage: ["Rust", "TypeScript", "React"],
+} as const;
 
 export default function RootLayout({
   children,
@@ -67,6 +126,12 @@ export default function RootLayout({
           href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
         />
         <ThemeInit />
+        <script
+          type="application/ld+json"
+          // dangerouslySetInnerHTML so the JSON sits inline as-is; React
+          // wouldn't accept an object child on <script>.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="min-h-full antialiased">
         <SmoothScroll />
