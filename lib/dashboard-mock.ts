@@ -102,23 +102,22 @@ const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
   }));
 
 // ── MCP / Skill base lists (week totals); scale by period.mcpCalls etc. ─
+// Top 5 only — a real Claude CLI user invokes each tool a handful of times
+// per week, not hundreds. Numbers scale up for Month / down for Day via
+// scaleCalls below.
 const MCP_BASE: NamedCount[] = [
-  { name: "filesystem", count: 312 },
-  { name: "github", count: 268 },
-  { name: "memory", count: 198 },
-  { name: "fetch", count: 156 },
-  { name: "postgres", count: 142 },
-  { name: "puppeteer", count: 98 },
-  { name: "slack", count: 64 },
-  { name: "brave-search", count: 46 },
+  { name: "filesystem", count: 9 },
+  { name: "github", count: 8 },
+  { name: "memory", count: 7 },
+  { name: "postgres", count: 6 },
+  { name: "fetch", count: 5 },
 ];
 const SKILL_BASE: NamedCount[] = [
-  { name: "pdf-reader", count: 92 },
-  { name: "web-search", count: 78 },
-  { name: "deck-builder", count: 61 },
-  { name: "code-runner", count: 54 },
-  { name: "image-gen", count: 38 },
-  { name: "data-viz", count: 33 },
+  { name: "pdf-reader", count: 10 },
+  { name: "deck-builder", count: 8 },
+  { name: "image-gen", count: 7 },
+  { name: "web-search", count: 6 },
+  { name: "code-runner", count: 5 },
 ];
 
 function scaleCalls(list: NamedCount[], periodTotal: number): NamedCount[] {
@@ -170,18 +169,24 @@ function splitMetrics(m: DesignMetrics): Metrics {
 
 const DAY_DM: DesignMetrics = {
   totalTokens: 1.94, inputTokens: 1.27, outputTokens: 0.67, cost: 7.2,
-  mcpCalls: 198, skillCalls: 54, requests: 441, sessions: 23,
-  deltaTokens: -0.18, deltaCost: -0.12, servers: 9, skills: 12,
+  // Realistic Claude CLI daily activity: ~1-2 invocations of a couple of
+  // tools, a handful of skill calls. Same 5 servers / skills are installed
+  // every period — the user's setup doesn't grow within a day.
+  mcpCalls: 7, skillCalls: 8, requests: 441, sessions: 23,
+  deltaTokens: -0.18, deltaCost: -0.12, servers: 5, skills: 5,
 };
 const WEEK_DM: DesignMetrics = {
   totalTokens: 12.4, inputTokens: 8.13, outputTokens: 4.27, cost: 46.1,
-  mcpCalls: 1284, skillCalls: 356, requests: 2847, sessions: 143,
-  deltaTokens: 0.14, deltaCost: -0.06, servers: 14, skills: 22,
+  // Matches the sum of MCP_BASE / SKILL_BASE so the list bars and the
+  // header total agree.
+  mcpCalls: 35, skillCalls: 36, requests: 2847, sessions: 143,
+  deltaTokens: 0.14, deltaCost: -0.06, servers: 5, skills: 5,
 };
 const MONTH_DM: DesignMetrics = {
   totalTokens: 27.5, inputTokens: 18.1, outputTokens: 9.4, cost: 101.3,
-  mcpCalls: 5230, skillCalls: 1442, requests: 11680, sessions: 602,
-  deltaTokens: 0.11, deltaCost: 0.09, servers: 18, skills: 28,
+  // ~4× the weekly baseline.
+  mcpCalls: 142, skillCalls: 148, requests: 11680, sessions: 602,
+  deltaTokens: 0.11, deltaCost: 0.09, servers: 5, skills: 5,
 };
 
 // Trends (sparkline points). Design's numbers, unchanged.
