@@ -5,24 +5,57 @@
 // Data comes from the same DEMO_DASHBOARD snapshot the hero panel uses, so
 // the numbers in the bento always match the panel.
 
-import { BarList, CostDonut, Heatmap, ModelRow } from "./tokenscope/charts";
-import { DEMO_DASHBOARD, pct, TH } from "@/lib/tokenscope-data";
+import {
+  BarList,
+  CostDonut,
+  Heatmap,
+  MiniStat,
+  Sparkline,
+} from "./tokenscope/charts";
+import { DEMO_DASHBOARD, fmtInt, pct, TH, type Theme } from "@/lib/tokenscope-data";
 import { Reveal } from "./Reveal";
 import { useTheme } from "./useTheme";
+
+// Panel-style uppercase mini label, inline-styled so it matches the rest of
+// the embedded chart typography (which is all inline-styled too).
+function PanelLabel({ t, children }: { t: Theme; children: React.ReactNode }) {
+  return (
+    <span
+      style={{
+        font: `600 10px ${t.ui}`,
+        color: t.dim,
+        letterSpacing: ".05em",
+        textTransform: "uppercase",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+// "<bold N> · <faint N installed>" right-side total used as the panel's
+// header for MCP / Skill sections.
+function ListTotal({ t, calls, count, unit }: { t: Theme; calls: number; count: number; unit: string }) {
+  return (
+    <span
+      style={{
+        font: `500 10px ${t.mono}`,
+        color: t.faint,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(calls)}</span> · {count} {unit}
+    </span>
+  );
+}
 
 export function Breakdowns() {
   const { dark } = useTheme();
   const t = TH[dark ? "dark" : "light"];
   const week = DEMO_DASHBOARD.week;
   const M = week.metrics;
-
-  // Mirror Panel's filters: only show models with ≥0.1% share, and only
-  // donate to the cost donut if cost > 0.
-  const tokenModels = week.models.filter(
-    (m) => Math.round((m.tokens / (M.totalTokens || 1)) * 1000) / 10 >= 0.1,
-  );
   const costModels = week.models.filter((m) => m.cost > 0);
-  const maxM = Math.max(...tokenModels.map((m) => m.tokens), 1e-9);
   const cacheShare = pct(M.cacheTokens, M.totalTokens);
 
   return (
@@ -39,24 +72,50 @@ export function Breakdowns() {
         </Reveal>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-          {/* Cost by model — the panel's CostDonut, just sized up for the tile. */}
+          {/* Cost by model — donut + Requests/Cost-trend mini-stats. */}
           <Reveal
             as="div"
             delayIndex={0}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5 md:row-span-2"
+            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
           >
             <h3 className="mb-1 text-[17px] font-semibold">Cost by model</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
               Where the dollars actually go, per period.
             </div>
             <CostDonut models={costModels} theme={t} size={132} thickness={18} />
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+                marginTop: 18,
+              }}
+            >
+              <MiniStat
+                label="Requests"
+                value={fmtInt(M.requests)}
+                sub={`${M.sessions} sessions`}
+                theme={t}
+              >
+                <Sparkline values={week.reqTrend} theme={t} width={52} height={20} accent={t.accent} />
+              </MiniStat>
+              <MiniStat
+                label="Cost trend"
+                value={`$${M.cost.toFixed(2)}`}
+                sub="this week"
+                theme={t}
+                accent={t.accent}
+              >
+                <Sparkline values={week.costTrend} theme={t} width={52} height={20} accent={t.accent} />
+              </MiniStat>
+            </div>
           </Reveal>
 
-          {/* MCP + Skill — two BarLists side-by-side. */}
+          {/* MCP + Skill — two BarLists with X · N totals in their headers. */}
           <Reveal
             as="div"
             delayIndex={1}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card-2 p-5.5 md:col-span-7 md:row-span-2"
+            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card-2 p-5.5 md:col-span-7"
           >
             <h3 className="mb-1 text-[17px] font-semibold">Tools you actually use</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
@@ -66,14 +125,14 @@ export function Breakdowns() {
               <div>
                 <div
                   style={{
-                    font: `600 10px ${t.ui}`,
-                    color: t.dim,
-                    letterSpacing: ".05em",
-                    textTransform: "uppercase",
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
                     marginBottom: 10,
                   }}
                 >
-                  MCP calls
+                  <PanelLabel t={t}>MCP calls</PanelLabel>
+                  <ListTotal t={t} calls={M.mcpCalls} count={M.servers} unit="servers" />
                 </div>
                 {week.mcp.length > 0 ? (
                   <BarList items={week.mcp} theme={t} accent={t.accent} />
@@ -89,14 +148,14 @@ export function Breakdowns() {
               <div>
                 <div
                   style={{
-                    font: `600 10px ${t.ui}`,
-                    color: t.dim,
-                    letterSpacing: ".05em",
-                    textTransform: "uppercase",
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
                     marginBottom: 10,
                   }}
                 >
-                  Skill calls
+                  <PanelLabel t={t}>Skill calls</PanelLabel>
+                  <ListTotal t={t} calls={M.skillCalls} count={M.skills} unit="skills" />
                 </div>
                 {week.skills.length > 0 ? (
                   <BarList items={week.skills} theme={t} accent={t.accent} />
@@ -116,11 +175,11 @@ export function Breakdowns() {
             </div>
           </Reveal>
 
-          {/* A year of activity — the panel's Heatmap, full bento width. */}
+          {/* A year of activity — heatmap takes 7 cols of the second row. */}
           <Reveal
             as="div"
             delayIndex={2}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-12"
+            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-7"
           >
             <h3 className="mb-1 text-[17px] font-semibold">A year of activity</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
@@ -129,12 +188,11 @@ export function Breakdowns() {
             <Heatmap days={DEMO_DASHBOARD.heatmap} theme={t} accent={t.accent} />
           </Reveal>
 
-          {/* Cache % — a plain big number; no chart needed. Uses the same
-              token-share calc as the panel. */}
+          {/* Cache % — sits next to the heatmap on the same row (5 cols). */}
           <Reveal
             as="div"
             delayIndex={3}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-7"
+            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
           >
             <h3 className="mb-1 text-[17px] font-semibold">Cache changes everything</h3>
             <div
@@ -147,29 +205,6 @@ export function Breakdowns() {
             <div className="mt-4.5 font-mono text-[11px] leading-[1.5] text-faint">
               Heavily cached days show huge token counts but a modest bill. Cache hits are billed
               at their own cheaper rate, not as fresh input.
-            </div>
-          </Reveal>
-
-          {/* Tokens by model — same ModelRow the panel renders. */}
-          <Reveal
-            as="div"
-            delayIndex={4}
-            className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
-          >
-            <h3 className="mb-1 text-[17px] font-semibold">Tokens by model</h3>
-            <div className="mb-4 text-[13.5px] leading-[1.5] text-dim">
-              Share of total tokens this week.
-            </div>
-            <div>
-              {tokenModels.map((m, i) => (
-                <ModelRow
-                  key={i}
-                  m={m}
-                  max={maxM}
-                  theme={t}
-                  share={(m.tokens / M.totalTokens) * 100}
-                />
-              ))}
             </div>
           </Reveal>
         </div>

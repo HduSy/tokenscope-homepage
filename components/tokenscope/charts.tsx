@@ -50,6 +50,23 @@ export function ModelRow({ m, max, theme, share }: { m: ModelStat; max: number; 
   );
 }
 
+// "Label · big value · trailing sparkline · sub" tile used at the bottom of
+// the Panel for Requests / Cost trend. Exported so Breakdowns can drop the
+// same pair under the cost donut.
+export function MiniStat({ label, value, sub, theme, accent, children }:
+  { label: string; value: string; sub?: string; theme: Theme; accent?: string; children?: React.ReactNode }) {
+  return (
+    <div style={{ background: theme.gridLine, borderRadius: 9, padding: "9px 10px", minWidth: 0 }}>
+      <div style={{ font: `500 9.5px ${theme.ui}`, color: theme.dim, letterSpacing: ".04em", textTransform: "uppercase" }}>{label}</div>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: 3, gap: 6 }}>
+        <span style={{ font: `600 17px/1 ${theme.mono}`, color: accent || theme.text }}>{value}</span>
+        {children}
+      </div>
+      {sub && <div style={{ font: `500 9px ${theme.mono}`, color: theme.faint, marginTop: 3 }}>{sub}</div>}
+    </div>
+  );
+}
+
 export function TokenGlyph({ color = "#1f9d63", size = 14 }: { color?: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 14 14">
