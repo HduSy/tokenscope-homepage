@@ -47,8 +47,10 @@ export function Footer() {
     <footer
       // Solid bg covers the page's ambient grid so the footer reads as a
       // dedicated bottom slab. Same colour as body's --color-bg, just
-      // opaque (no background-image bleed-through).
-      className="border-t border-border bg-bg px-0 pt-14 pb-10"
+      // opaque (no background-image bleed-through). The top hairline
+      // border-t and the bottom one above the copyright are both attached
+      // to full-width elements so they actually span the viewport.
+      className="border-t border-border bg-bg pt-14"
     >
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="grid grid-cols-1 gap-9 md:grid-cols-[2fr_1fr_1fr_1fr]">
@@ -93,7 +95,12 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-11 flex flex-wrap items-center justify-between gap-2.5 border-t border-border pt-6 text-[13px] text-faint">
+      </div>
+      {/* Full-width hairline above the copyright row — the divider belongs
+          to the outer slab, not the centred container, so it spans edge to
+          edge instead of stopping at max-w-1200. */}
+      <div className="mt-11 border-t border-border pb-10">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-2.5 px-6 pt-6 text-[13px] text-faint">
           <span>© 2026 HduSy · MIT License</span>
           <span>Built with Tauri · Rust + React</span>
         </div>

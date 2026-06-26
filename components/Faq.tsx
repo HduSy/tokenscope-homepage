@@ -132,7 +132,10 @@ function FaqItem({ q, a, first }: Faq & { first: boolean }) {
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <div className="max-w-[70ch] px-6 pb-5 text-[14.5px] leading-[1.7] text-dim">
+          {/* pt-3 keeps the answer from crashing into the button's own bottom
+              padding; px-6 / pb-5 mirror the button's horizontal padding +
+              the panel's bottom rhythm. */}
+          <div className="max-w-[70ch] px-6 pt-3 pb-5 text-[14.5px] leading-[1.7] text-dim">
             {a}
           </div>
         </div>

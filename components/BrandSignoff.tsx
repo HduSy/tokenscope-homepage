@@ -1,9 +1,9 @@
 import { BackToTop } from "./BackToTop";
 
-// Bottom slab: giant filled "Tokenscope" wordmark + a back-to-top button
-// pinned to the lower-right. Outer container is the relative anchor; the
-// wordmark is the only aria-hidden piece, the back-to-top stays in the
-// accessibility tree.
+// Bottom slab: giant "Token" outlined + "scope" filled in accent green —
+// emphasises the unique half of the brand the same way the marketing copy
+// does throughout the page. Wordmark stays aria-hidden; the back-to-top
+// button is in its own accessible layer.
 
 export function BrandSignoff() {
   return (
@@ -25,10 +25,18 @@ export function BrandSignoff() {
               fontWeight: 700,
               fontSize: 100,
               letterSpacing: "-0.03em",
-              fill: "var(--color-card)",
             }}
           >
-            Tokenscope
+            <tspan
+              style={{
+                fill: "none",
+                stroke: "var(--color-border-strong)",
+                strokeWidth: 1.5,
+              }}
+            >
+              Token
+            </tspan>
+            <tspan style={{ fill: "var(--color-accent)" }}>scope</tspan>
           </text>
         </svg>
       </div>
