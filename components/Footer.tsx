@@ -44,7 +44,12 @@ const cols: Col[] = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border px-0 pt-14 pb-10">
+    <footer
+      // Solid bg covers the page's ambient grid so the footer reads as a
+      // dedicated bottom slab. Same colour as body's --color-bg, just
+      // opaque (no background-image bleed-through).
+      className="border-t border-border bg-bg px-0 pt-14 pb-10"
+    >
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="grid grid-cols-1 gap-9 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div>
