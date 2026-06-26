@@ -3,10 +3,7 @@ import { Reveal } from "./Reveal";
 
 export function InstallSection() {
   return (
-    <section
-      id="install"
-      className="border-t border-border bg-bg-elev py-16 sm:py-24"
-    >
+    <section id="install" className="py-16 sm:py-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>

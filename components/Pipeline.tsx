@@ -38,10 +38,7 @@ const steps = [
 
 export function Pipeline() {
   return (
-    <section
-      id="how"
-      className="border-y border-border bg-bg-elev py-16 sm:py-24"
-    >
+    <section id="how" className="py-16 sm:py-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>

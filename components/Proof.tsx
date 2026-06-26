@@ -11,7 +11,7 @@ const logos: { href: string; alt: string }[] = [
 
 export function Proof() {
   return (
-    <div className="border-y border-border py-3.5">
+    <div className="py-3.5">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-9 px-6">
         {logos.map((l) => (
           // eslint-disable-next-line @next/next/no-img-element

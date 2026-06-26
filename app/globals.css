@@ -76,12 +76,20 @@ html {
 }
 
 body {
-  background: var(--color-bg);
+  background-color: var(--color-bg);
+  /* Subtle grid lines using the same --color-grid-line that panels use
+     internally — keeps the whole page on one ambient background and
+     swaps along with the theme. 56px cell size keeps it visible but
+     unobtrusive at desktop and mobile widths. */
+  background-image:
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1,
