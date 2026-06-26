@@ -1,5 +1,6 @@
 import { Breakdowns } from "@/components/Breakdowns";
 import { BrandSignoff } from "@/components/BrandSignoff";
+import { Faq } from "@/components/Faq";
 import { FinalCta } from "@/components/FinalCta";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <Pipeline />
       <TokenTypes />
       <InstallSection />
+      <Faq />
       <FinalCta />
       <Footer />
       <BrandSignoff />
