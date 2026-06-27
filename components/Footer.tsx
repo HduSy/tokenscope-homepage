@@ -10,6 +10,7 @@ const cols: Col[] = [
       { href: "#breakdowns", label: "Breakdowns" },
       { href: "#how", label: "How it works" },
       { href: "#pricing", label: "Token math" },
+      { href: "#faq", label: "FAQ" },
     ],
   },
   {
