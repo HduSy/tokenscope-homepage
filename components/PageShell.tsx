@@ -24,12 +24,14 @@ import { getDict, type Locale } from "@/lib/i18n";
 // extractor has an explicit landmark to anchor on.
 
 export function PageShell({ locale }: { locale: Locale }) {
-  const { software, faq } = buildJsonLd(locale);
+  const { organization, software, faq } = buildJsonLd(locale);
   const t = getDict(locale);
   return (
     <>
-      {/* JSON-LD: SoftwareApplication + FAQPage, both in the page's locale. */}
-      {[software, faq].map((data, i) => (
+      {/* JSON-LD: Organization (brand identity + SERP logo), SoftwareApplication,
+          and FAQPage. SoftwareApplication + FAQ are locale-aware; Organization
+          is identical on both routes. */}
+      {[organization, software, faq].map((data, i) => (
         <script
           key={i}
           type="application/ld+json"

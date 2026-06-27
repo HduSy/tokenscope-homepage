@@ -79,6 +79,19 @@ export function buildPageMetadata(locale: Locale): Metadata {
 
 export function buildJsonLd(locale: Locale) {
   const dict = getDict(locale);
+  // Organization node — Google reads `logo` (a ≥112×112 raster image) to
+  // render the square brand mark in search results, the Knowledge Panel, and
+  // Discover. public/logo.png is the 512×512 rasterized brand mark. `sameAs`
+  // wires the canonical social profile. This is locale-independent so both
+  // routes emit the same Organization identity.
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo.png`,
+    sameAs: ["https://github.com/HduSy/tokenscope"],
+  };
   const software = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -115,5 +128,5 @@ export function buildJsonLd(locale: Locale) {
       acceptedAnswer: { "@type": "Answer", text: f.aPlain },
     })),
   };
-  return { software, faq };
+  return { organization, software, faq };
 }
