@@ -123,7 +123,7 @@ export const zh: Dict = {
     },
     cache: {
       title: "缓存改变一切",
-      pctSuffix: "命中缓存",
+      pctSuffix: "% 命中缓存",
       footnote:
         "缓存命中高的日子，Token 数巨大但账单依然不高 —— 缓存读取走的是它自己的便宜单价，并不是按新输入计费的。",
     },
