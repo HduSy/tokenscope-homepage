@@ -1,9 +1,9 @@
 // Ported 1:1 from the Tokenscope app's src/data.ts. The Tauri-only fetch path
 // is dropped — the homepage ships a synthesised dashboard built from the
-// design-canvas mock (see ./dashboard-mock) so the demo panel can render
-// without any network call.
+// design-canvas mock (see ./dashboard-mock). Callers should call
+// `buildDemoDashboard(locale)` to get a fresh, locale-aware copy.
 
-export { DEMO_DASHBOARD } from "./dashboard-mock";
+export { buildDemoDashboard } from "./dashboard-mock";
 
 export interface SeriesPoint {
   label: string;
@@ -64,7 +64,7 @@ export interface Dashboard {
 
 // The snapshot JSON is hand-shaped to match the Dashboard interface — cast
 // rather than validate at runtime so the bundle stays lean.
-// (DEMO_DASHBOARD is re-exported above from ./dashboard-mock.)
+// (buildDemoDashboard is re-exported above from ./dashboard-mock.)
 
 // ── formatting helpers ──────────────────────────────────────────
 export const fmtTokens = (m: number) =>

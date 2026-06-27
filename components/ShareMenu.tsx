@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon, type IconName } from "./Icon";
-import { SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Share menu in the nav: a share icon opens a small popover with the five
 // platforms. Each entry builds the platform's share-intent URL from the live
@@ -43,7 +44,8 @@ const PLATFORMS: {
   },
 ];
 
-export function ShareMenu() {
+export function ShareMenu({ locale }: { locale: Locale }) {
+  const dict = getDict(locale);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -73,7 +75,7 @@ export function ShareMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Share"
+        aria-label={dict.nav.share}
         aria-haspopup="menu"
         aria-expanded={open}
         className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-dim transition-[color,border-color] hover:text-text hover:border-border-strong"
@@ -94,7 +96,7 @@ export function ShareMenu() {
             <a
               key={p.name}
               role="menuitem"
-              href={p.href(url, SITE_TAGLINE)}
+              href={p.href(url, dict.site.tagline)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setOpen(false)}

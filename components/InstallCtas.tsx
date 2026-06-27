@@ -2,6 +2,7 @@
 
 import { Button } from "./Button";
 import { Icon } from "./Icon";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // CTA pair used inside the hero and the final CTA card. "Install with
 // Homebrew" just smooth-scrolls to the install section — the brew command
@@ -14,12 +15,13 @@ function scrollToInstall() {
     ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
 }
 
-export function InstallCtas({ className = "" }: { className?: string }) {
+export function InstallCtas({ locale, className = "" }: { locale: Locale; className?: string }) {
+  const t = getDict(locale);
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
       <Button onClick={scrollToInstall}>
         <Icon name="download-simple" size={18} />
-        Install with Homebrew
+        {t.cta.install}
       </Button>
       <Button
         as="a"
@@ -29,7 +31,7 @@ export function InstallCtas({ className = "" }: { className?: string }) {
         variant="ghost"
       >
         <Icon name="github-logo" size={18} />
-        View on GitHub
+        {t.cta.github}
       </Button>
     </div>
   );

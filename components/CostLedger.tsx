@@ -35,7 +35,22 @@ const FADE = `opacity ${ROW_FADE_MS}ms cubic-bezier(0.16, 1, 0.3, 1)`;
 const money = (v: number, d = 2) => "$" + v.toFixed(d);
 const costOf = (r: LedgerRow) => (r.count * r.rate) / 1e6;
 
-export function CostLedger({ rows, total }: { rows: LedgerRow[]; total: number }) {
+export type LedgerLabels = {
+  type: string;
+  tokensRate: string;
+  cost: string;
+  totalLabel: string;
+};
+
+const EN_LABELS: LedgerLabels = {
+  type: "type",
+  tokensRate: "tokens × $/M",
+  cost: "cost",
+  totalLabel: "total · one session",
+};
+
+export function CostLedger({ rows, total, labels }: { rows: LedgerRow[]; total: number; labels?: LedgerLabels }) {
+  const L = labels || EN_LABELS;
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.35 });
   const reduce =
     typeof window !== "undefined" &&
@@ -85,9 +100,9 @@ export function CostLedger({ rows, total }: { rows: LedgerRow[]; total: number }
   return (
     <div ref={ref} className="min-w-0 self-center font-mono text-[12px] tabular-nums sm:text-[13px]">
       <div className={`${cols} pb-1.5 text-[10.5px] uppercase tracking-[0.06em] text-faint`}>
-        <span>type</span>
-        <span className="text-right">tokens × $/M</span>
-        <span className="text-right">cost</span>
+        <span>{L.type}</span>
+        <span className="text-right">{L.tokensRate}</span>
+        <span className="text-right">{L.cost}</span>
       </div>
       {rows.map((r, i) => (
         <div key={r.type} className={`${cols} py-1.5`} style={{ opacity: lit > i ? 1 : 0.4, transition: FADE }}>
@@ -99,7 +114,7 @@ export function CostLedger({ rows, total }: { rows: LedgerRow[]; total: number }
         </div>
       ))}
       <div className={`${cols} mt-1 border-t border-border pt-2.5`} style={{ opacity: totalOn ? 1 : 0.4, transition: FADE }}>
-        <span className="text-dim">total · one session</span>
+        <span className="text-dim">{L.totalLabel}</span>
         <span />
         <span className="whitespace-nowrap text-right text-[15px] font-semibold text-accent">
           {money(totalVal)}

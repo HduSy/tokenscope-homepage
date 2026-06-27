@@ -3,17 +3,19 @@
 import { BREW_CMD } from "@/lib/data";
 import { Icon } from "./Icon";
 import { showToast } from "./Toast";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // The terminal-styled "$ brew install …" block with a copy button.
 // Click feedback lives in the toast — the button label stays "Copy" to
 // avoid showing "Copied" twice (toast + button) on every click.
 
-export function Install() {
+export function Install({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
   const onCopy = () => {
     navigator.clipboard
       ?.writeText(BREW_CMD)
-      .then(() => showToast("Copied brew install"))
-      .catch(() => showToast("Select and copy"));
+      .then(() => showToast(t.install.toastCopied))
+      .catch(() => showToast(t.install.toastFallback));
   };
 
   return (
@@ -53,7 +55,7 @@ export function Install() {
           }}
         >
           <Icon name="copy" size={14} />
-          Copy
+          {t.install.copyBtn}
         </button>
       </div>
     </div>

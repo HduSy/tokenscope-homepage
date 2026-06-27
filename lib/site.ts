@@ -1,10 +1,10 @@
-// Single source for the canonical site URL — referenced by metadataBase,
-// the sitemap, robots.txt, and the JSON-LD payload. If the production
-// domain ever moves, change this in one place.
+// Site-wide locale-invariant constants. The taglines and descriptions used to
+// live here too, but they moved into lib/i18n/{en,zh}.tsx once the page went
+// bilingual. What stays:
+//
+//   - SITE_URL: canonical domain, used by metadataBase, sitemap, robots,
+//     JSON-LD url field, and the ShareMenu fallback URL during SSR.
+//   - SITE_NAME: the brand string, untranslated (it's a proper noun).
 
 export const SITE_URL = "https://tokenscope.app";
 export const SITE_NAME = "Tokenscope";
-export const SITE_TAGLINE =
-  "Claude Code token cost, in your macOS menu bar";
-export const SITE_DESCRIPTION =
-  "A macOS menu-bar app that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.";

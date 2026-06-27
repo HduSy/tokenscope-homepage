@@ -1,4 +1,5 @@
 import { BackToTop } from "./BackToTop";
+import type { Locale } from "@/lib/i18n";
 
 // Bottom slab: giant "Token" outlined + "scope" filled in accent green —
 // emphasises the unique half of the brand the same way the marketing copy
@@ -7,16 +8,16 @@ import { BackToTop } from "./BackToTop";
 // ABOVE the wordmark (floating over the letters would cover "scope"). On
 // desktop (>=md) it floats bottom-right like the original signoff.
 
-export function BrandSignoff() {
+export function BrandSignoff({ locale }: { locale: Locale }) {
   return (
     <div className="relative bg-bg">
       {/* Mobile: above the wordmark so it never overlaps "scope". */}
       <div className="mx-auto flex max-w-[1200px] justify-end px-6 pt-8 sm:pt-10 md:hidden">
-        <BackToTop />
+        <BackToTop locale={locale} />
       </div>
       {/* Desktop (>=md): float bottom-right like the original signoff. */}
       <div className="absolute bottom-5 right-6 hidden md:block">
-        <BackToTop />
+        <BackToTop locale={locale} />
       </div>
       <div aria-hidden="true" className="select-none overflow-hidden">
         <svg

@@ -1,54 +1,29 @@
 import { Icon, type IconName } from "./Icon";
 import { Reveal } from "./Reveal";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Four-step read-only pipeline. Wrapped in a single bg-card panel so the
 // internal cross-dividers register against an opaque background rather than
 // fighting the page-wide grid. Steps stack vertically on mobile, 2x2 on md+.
 
-const steps: { icon: IconName; title: string; body: React.ReactNode }[] = [
-  {
-    icon: "database",
-    title: "Read",
-    body: (
-      <>
-        Scans <code className="rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent">~/.claude/projects/**/*.jsonl</code> for every assistant
-        message, its usage, model, and tool calls.
-      </>
-    ),
-  },
-  {
-    icon: "funnel",
-    title: "Dedupe",
-    body: (
-      <>
-        Collapses streaming retries by <code className="rounded bg-grid-line px-1.5 py-px font-mono text-[12.5px] text-accent">message.id</code> and merges
-        multi-line messages, so each turn is counted exactly once.
-      </>
-    ),
-  },
-  {
-    icon: "currency-dollar",
-    title: "Price",
-    body: <>Matches models.dev first, then LiteLLM, then a built-in snapshot. Cached for 24 hours with an offline fallback.</>,
-  },
-  {
-    icon: "chart-bar",
-    title: "Show",
-    body: <>Renders today&apos;s total in the menu bar and the full dashboard a click away, refreshed in the background.</>,
-  },
-];
+export function Pipeline({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
+  const steps: { icon: IconName; title: string; body: React.ReactNode }[] = [
+    { icon: "database", title: t.pipeline.steps.read.title, body: t.pipeline.steps.read.body },
+    { icon: "funnel", title: t.pipeline.steps.dedupe.title, body: t.pipeline.steps.dedupe.body },
+    { icon: "currency-dollar", title: t.pipeline.steps.price.title, body: t.pipeline.steps.price.body },
+    { icon: "chart-bar", title: t.pipeline.steps.show.title, body: t.pipeline.steps.show.body },
+  ];
 
-export function Pipeline() {
   return (
     <section id="how" className="pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            Read-only by design — no telemetry, no API key.
+            {t.pipeline.h2}
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
-            Tokenscope reads the JSONL logs your Claude Code already writes to disk. No API keys.
-            No calls to Anthropic. Nothing leaves your Mac.
+            {t.pipeline.intro}
           </p>
         </Reveal>
 

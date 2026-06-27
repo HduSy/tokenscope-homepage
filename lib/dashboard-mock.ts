@@ -5,6 +5,12 @@
 // "input" as the prompt-cache bucket and keep 15% as fresh input. Total
 // tokens per period are unchanged; the inner split shifts to make the
 // "% cached" marketing message land.
+//
+// `buildDemoDashboard(locale)` returns a fresh, locale-aware copy: weekday
+// short/long labels, the "Day N" tooltip prefix, and the "Local" vendor name
+// for the bundled Llama row are all swapped to the matching dict entries.
+// Brand/model names, MCP / Skill identifiers, and all numeric values stay
+// locale-invariant.
 
 import type {
   Dashboard,
@@ -15,6 +21,7 @@ import type {
   PeriodReport,
   SeriesPoint,
 } from "./tokenscope-data";
+import { getDict, type Locale } from "./i18n";
 
 // Of design's "input" field, how much becomes cache vs real input.
 const CACHE_SHARE = 0.85;
@@ -22,24 +29,27 @@ const INPUT_SHARE = 1 - CACHE_SHARE;
 
 // ── Models (week baselines) ─────────────────────────────────────
 // Same five entries as design's MODELS const. Cost==0 for the local Llama
-// is intentional — it's a free model, not an unpriced one.
-const DESIGN_MODELS: Omit<ModelStat, "priced">[] = [
-  { name: "Claude Sonnet 4.5", vendor: "Anthropic", tokens: 5.82, cost: 18.4, color: "#1f9d63" },
-  { name: "Claude Opus 4.1", vendor: "Anthropic", tokens: 3.07, cost: 19.1, color: "#34c27e" },
-  { name: "GPT-5", vendor: "OpenAI", tokens: 1.94, cost: 6.2, color: "#6ad0a0" },
-  { name: "Gemini 2.5 Pro", vendor: "Google", tokens: 0.91, cost: 2.4, color: "#a7e3c5" },
-  { name: "Llama 3.3 70B", vendor: "Local", tokens: 0.66, cost: 0.0, color: "#4b5a52" },
+// is intentional — it's a free model, not an unpriced one. Vendor strings
+// for the four named providers stay English; "Local" is locale-aware (set
+// per-call from the dict).
+type DesignModel = Omit<ModelStat, "priced" | "vendor"> & { vendorKey: "Anthropic" | "OpenAI" | "Google" | "Local" };
+const DESIGN_MODELS: DesignModel[] = [
+  { name: "Claude Sonnet 4.5", vendorKey: "Anthropic", tokens: 5.82, cost: 18.4, color: "#1f9d63" },
+  { name: "Claude Opus 4.1", vendorKey: "Anthropic", tokens: 3.07, cost: 19.1, color: "#34c27e" },
+  { name: "GPT-5", vendorKey: "OpenAI", tokens: 1.94, cost: 6.2, color: "#6ad0a0" },
+  { name: "Gemini 2.5 Pro", vendorKey: "Google", tokens: 0.91, cost: 2.4, color: "#a7e3c5" },
+  { name: "Llama 3.3 70B", vendorKey: "Local", tokens: 0.66, cost: 0.0, color: "#4b5a52" },
 ];
 const WEEK_TOKENS = DESIGN_MODELS.reduce((s, m) => s + m.tokens, 0); // 12.40
 const WEEK_COST = DESIGN_MODELS.reduce((s, m) => s + m.cost, 0); // 46.10
 
 // Scale the week-baseline distribution to a period's total tokens / cost.
-function scaleModels(totalTokens: number, totalCost: number): ModelStat[] {
+function scaleModels(totalTokens: number, totalCost: number, localVendor: string): ModelStat[] {
   const rt = totalTokens / WEEK_TOKENS;
   const rc = totalCost / WEEK_COST;
   return DESIGN_MODELS.map((m) => ({
     name: m.name,
-    vendor: m.vendor,
+    vendor: m.vendorKey === "Local" ? localVendor : m.vendorKey,
     tokens: +(m.tokens * rt).toFixed(2),
     cost: +(m.cost * rc).toFixed(2),
     color: m.color,
@@ -48,35 +58,32 @@ function scaleModels(totalTokens: number, totalCost: number): ModelStat[] {
 }
 
 // ── Per-period raw series (input/output only; cache derived below) ─
-type RawPt = { label: string; full: string; input: number; output: number };
+type RawPt = { labelIdx: number; fullIdx: number; input: number; output: number };
 
-// Week: full day names.
+// Week: 7 weekday rows. labelIdx / fullIdx point at the dict arrays so the
+// strings come from getDict(locale).dashboard at build-time.
 const WEEK_RAW: RawPt[] = [
-  { label: "Mon", full: "Monday", input: 0.92, output: 0.48 },
-  { label: "Tue", full: "Tuesday", input: 1.36, output: 0.74 },
-  { label: "Wed", full: "Wednesday", input: 1.18, output: 0.62 },
-  { label: "Thu", full: "Thursday", input: 1.71, output: 0.89 },
-  { label: "Fri", full: "Friday", input: 1.52, output: 0.78 },
-  { label: "Sat", full: "Saturday", input: 0.58, output: 0.31 },
-  { label: "Sun", full: "Sunday", input: 0.86, output: 0.44 },
+  { labelIdx: 0, fullIdx: 0, input: 0.92, output: 0.48 },
+  { labelIdx: 1, fullIdx: 1, input: 1.36, output: 0.74 },
+  { labelIdx: 2, fullIdx: 2, input: 1.18, output: 0.62 },
+  { labelIdx: 3, fullIdx: 3, input: 1.71, output: 0.89 },
+  { labelIdx: 4, fullIdx: 4, input: 1.52, output: 0.78 },
+  { labelIdx: 5, fullIdx: 5, input: 0.58, output: 0.31 },
+  { labelIdx: 6, fullIdx: 6, input: 0.86, output: 0.44 },
 ];
 
 // Day: 24 hourly buckets — low overnight, peak afternoon. Same shape as
-// design's IIFE.
+// design's IIFE. Labels are "00", "06", "12", "18" — not localized (hours
+// are universal); tooltip "HH:00" likewise stays numeric.
 const DAY_SHAPE = [
   0.05, 0.03, 0.02, 0.02, 0.03, 0.06, 0.12, 0.28,
   0.46, 0.62, 0.74, 0.81, 0.69, 0.58, 0.83, 0.92,
   0.78, 0.64, 0.49, 0.38, 0.31, 0.22, 0.14, 0.08,
 ];
-const DAY_RAW: RawPt[] = DAY_SHAPE.map((v, h) => ({
-  label: h % 6 === 0 ? String(h).padStart(2, "0") : "",
-  full: `${String(h).padStart(2, "0")}:00`,
-  input: +(v * 0.11).toFixed(3),
-  output: +(v * 0.058).toFixed(3),
-}));
 
-// Month: 30 daily buckets, weekly rhythm (weekends lower), label every 5 days.
-const MONTH_RAW: RawPt[] = Array.from({ length: 30 }, (_, i) => {
+// Month: 30 daily buckets, weekly rhythm (weekends lower).
+type MonthPt = { day: number; input: number; output: number };
+const MONTH_RAW: MonthPt[] = Array.from({ length: 30 }, (_, i) => {
   const d = i + 1;
   const dow = (d - 1) % 7;
   const weekend = dow === 5 || dow === 6;
@@ -84,22 +91,11 @@ const MONTH_RAW: RawPt[] = Array.from({ length: 30 }, (_, i) => {
   const wobble = 0.78 + 0.44 * Math.abs(Math.sin(d * 1.7));
   const v = base * wobble;
   return {
-    label: d === 1 || d % 5 === 0 ? String(d) : "",
-    full: `Day ${d}`,
+    day: d,
     input: +(v * 0.62).toFixed(3),
     output: +(v * 0.32).toFixed(3),
   };
 });
-
-// Apply the cache split to every point in a raw series.
-const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
-  raw.map((r) => ({
-    label: r.label,
-    full: r.full,
-    input: +(r.input * INPUT_SHARE).toFixed(4),
-    cache: +(r.input * CACHE_SHARE).toFixed(4),
-    output: r.output,
-  }));
 
 // ── MCP / Skill base lists (week totals); scale by period.mcpCalls etc. ─
 // Top 5 only. Each list sums to 10 calls / week — a realistic Claude Code
@@ -242,11 +238,12 @@ function buildPeriod(
   series: SeriesPoint[],
   dm: DesignMetrics,
   trends: { req: number[]; cost: number[] },
+  localVendor: string,
 ): PeriodReport {
   return {
     metrics: splitMetrics(dm),
     series,
-    models: scaleModels(dm.totalTokens, dm.cost),
+    models: scaleModels(dm.totalTokens, dm.cost, localVendor),
     mcp: scaleCalls(MCP_BASE, dm.mcpCalls),
     skills: scaleCalls(SKILL_BASE, dm.skillCalls),
     reqTrend: trends.req,
@@ -254,11 +251,55 @@ function buildPeriod(
   };
 }
 
-export const DEMO_DASHBOARD: Dashboard = {
-  day: buildPeriod(splitSeries(DAY_RAW), DAY_DM, TRENDS.Day),
-  week: buildPeriod(splitSeries(WEEK_RAW), WEEK_DM, TRENDS.Week),
-  month: buildPeriod(splitSeries(MONTH_RAW), MONTH_DM, TRENDS.Month),
-  heatmap: buildHeatmap(),
-  todayTokens: DAY_DM.totalTokens,
-  generatedAt: "2026-06-05T00:00:00Z",
-};
+// Apply the cache split + locale labels to a raw series.
+function splitWeek(raw: RawPt[], shortLabels: string[], longLabels: string[]): SeriesPoint[] {
+  return raw.map((r) => ({
+    label: shortLabels[r.labelIdx],
+    full: longLabels[r.fullIdx],
+    input: +(r.input * INPUT_SHARE).toFixed(4),
+    cache: +(r.input * CACHE_SHARE).toFixed(4),
+    output: r.output,
+  }));
+}
+function splitDay(): SeriesPoint[] {
+  return DAY_SHAPE.map((v, h) => ({
+    label: h % 6 === 0 ? String(h).padStart(2, "0") : "",
+    full: `${String(h).padStart(2, "0")}:00`,
+    input: +(v * 0.11 * INPUT_SHARE).toFixed(4),
+    cache: +(v * 0.11 * CACHE_SHARE).toFixed(4),
+    output: +(v * 0.058).toFixed(3),
+  }));
+}
+function splitMonth(dayPrefix: string): SeriesPoint[] {
+  return MONTH_RAW.map((r) => ({
+    label: r.day === 1 || r.day % 5 === 0 ? String(r.day) : "",
+    // Chinese reads "第 N 天"; English reads "Day N". Concatenation is
+    // good enough since both languages keep the digit at the end.
+    full: `${dayPrefix} ${r.day}`,
+    input: +(r.input * INPUT_SHARE).toFixed(4),
+    cache: +(r.input * CACHE_SHARE).toFixed(4),
+    output: r.output,
+  }));
+}
+
+// Public entry point. Per locale, build the entire Dashboard once and let
+// callers cache the result (HeroPanel / Breakdowns each call once per render
+// — cheap, and the data is small).
+export function buildDemoDashboard(locale: Locale): Dashboard {
+  const dict = getDict(locale);
+  const { weekdaysShort, weekdaysLong, dayPrefix, vendorLocal } = dict.dashboard;
+
+  return {
+    day: buildPeriod(splitDay(), DAY_DM, TRENDS.Day, vendorLocal),
+    week: buildPeriod(
+      splitWeek(WEEK_RAW, weekdaysShort, weekdaysLong),
+      WEEK_DM,
+      TRENDS.Week,
+      vendorLocal,
+    ),
+    month: buildPeriod(splitMonth(dayPrefix), MONTH_DM, TRENDS.Month, vendorLocal),
+    heatmap: buildHeatmap(),
+    todayTokens: DAY_DM.totalTokens,
+    generatedAt: "2026-06-05T00:00:00Z",
+  };
+}

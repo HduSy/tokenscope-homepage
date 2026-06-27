@@ -27,6 +27,27 @@ import {
   MiniStat,
 } from "./charts";
 import { useThemeTransition } from "../useThemeTransition";
+import type { Dict } from "@/lib/i18n";
+
+// Subset of the panel dict slice. Made optional so existing call sites that
+// haven't been updated still work with English defaults.
+type PanelLabels = Dict["panel"];
+const EN_DEFAULT: PanelLabels = {
+  day: "Day", week: "Week", month: "Month",
+  totalTokens: "Total tokens", estCost: "Est. cost",
+  inputShort: "In", inputLong: "Input", outputShort: "Out", outputLong: "Output", cachedSuffix: "cached",
+  tokensByModel: "Tokens by model", costByModel: "Cost by model",
+  emptyUsage: "No usage in this period", emptyMcp: "No MCP calls in this period", emptySkill: "No skill calls in this period",
+  requests: "Requests", sessionsSuffix: "sessions", costTrend: "Cost trend",
+  trendSub: { Day: "today 24h", Week: "this week", Month: "this month" },
+  mcpCalls: "MCP calls", skillCalls: "Skill calls", servers: "servers", skills: "skills",
+  dailyActivity: "Daily activity",
+  unpriced: { singularSuffix: "model without pricing data (cost not counted):", pluralSuffix: "models without pricing data (cost not counted):" },
+  footerEstimate: "Est. cost via models.dev / LiteLLM · estimate",
+  screenshot: "Screenshot", themeLight: "Switch to light", themeDark: "Switch to dark", themeToggleAria: "toggle theme",
+  tooltipNoTokens: "No tokens", tooltipNoCalls: "No calls", tooltipTokensSuffix: "tokens",
+  heatLess: "Less", heatMore: "More", barListMore: "more", barListLess: "show less",
+};
 
 // Count up to `target`. Restarts from 0 whenever `resetKey` changes (popover
 // open / period switch); on a live value change it eases from the current
@@ -85,8 +106,8 @@ function sharePcts(values: number[]): number[] {
   return units.map((u) => u / 10);
 }
 
-function SplitLegend({ t, inputM, outputM, cachedPct }:
-  { t: Theme; inputM: number; outputM: number; cachedPct: number }) {
+function SplitLegend({ t, inputM, outputM, cachedPct, labels }:
+  { t: Theme; inputM: number; outputM: number; cachedPct: number; labels: PanelLabels }) {
   const ref = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
   const key = `${inputM}|${outputM}|${cachedPct}`;
@@ -100,9 +121,9 @@ function SplitLegend({ t, inputM, outputM, cachedPct }:
       display: "flex", alignItems: "center", gap: 14,
       font: `500 10px ${t.mono}`, color: t.dim, marginBottom: 14, whiteSpace: "nowrap", overflow: "hidden",
     }}>
-      <span><span style={{ color: t.accent }}>●</span> {compact ? "In" : "Input"} {inputM.toFixed(2)}M</span>
-      <span><span style={{ color: t.accentSoft }}>●</span> {compact ? "Out" : "Output"} {outputM.toFixed(2)}M</span>
-      <span style={{ color: t.faint }}>{cachedPct}% cached</span>
+      <span><span style={{ color: t.accent }}>●</span> {compact ? labels.inputShort : labels.inputLong} {inputM.toFixed(2)}M</span>
+      <span><span style={{ color: t.accentSoft }}>●</span> {compact ? labels.outputShort : labels.outputLong} {outputM.toFixed(2)}M</span>
+      <span style={{ color: t.faint }}>{cachedPct}% {labels.cachedSuffix}</span>
     </div>
   );
 }
@@ -114,7 +135,7 @@ const Label = ({ t, children }: { t: Theme; children: React.ReactNode }) => (
   <span style={{ font: `600 10px ${t.ui}`, color: t.dim, letterSpacing: ".05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{children}</span>
 );
 
-function PanelThemeToggle({ dark, theme }: { dark: boolean; theme: Theme }) {
+function PanelThemeToggle({ dark, theme, labels }: { dark: boolean; theme: Theme; labels: PanelLabels }) {
   const t = theme;
   const transition = useThemeTransition();
   const ref = useRef<HTMLButtonElement>(null);
@@ -127,8 +148,8 @@ function PanelThemeToggle({ dark, theme }: { dark: boolean; theme: Theme }) {
         const rect = el.getBoundingClientRect();
         transition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
       }}
-      title={dark ? "Switch to light" : "Switch to dark"}
-      aria-label="toggle theme"
+      title={dark ? labels.themeLight : labels.themeDark}
+      aria-label={labels.themeToggleAria}
       style={{
         display: "inline-flex", alignItems: "center", justifyContent: "center",
         width: 26, height: 26, borderRadius: 7, cursor: "pointer", padding: 0,
@@ -152,7 +173,7 @@ function PanelThemeToggle({ dark, theme }: { dark: boolean; theme: Theme }) {
 // Decorative screenshot control for the hero. No real capture - clicking just
 // plays a quick camera-flash pulse (Web Animations API, so no CSS keyframes
 // needed) so the button reads as interactive in the demo.
-function PanelScreenshot({ theme }: { theme: Theme }) {
+function PanelScreenshot({ theme, label }: { theme: Theme; label: string }) {
   const t = theme;
   const flashRef = useRef<HTMLSpanElement>(null);
   return (
@@ -163,8 +184,8 @@ function PanelScreenshot({ theme }: { theme: Theme }) {
           { duration: 450, easing: "ease-out" },
         );
       }}
-      title="Screenshot"
-      aria-label="Screenshot"
+      title={label}
+      aria-label={label}
       style={{
         display: "inline-flex", alignItems: "center", justifyContent: "center",
         width: 26, height: 26, borderRadius: 7, cursor: "pointer", padding: 0,
@@ -181,10 +202,21 @@ function PanelScreenshot({ theme }: { theme: Theme }) {
   );
 }
 
-export function Panel({ dash, dark, openGen, active, compact = false }:
-  { dash: Dashboard; dark: boolean; openGen: number; active: boolean; compact?: boolean }) {
+export function Panel({ dash, dark, openGen, active, compact = false, labels }:
+  { dash: Dashboard; dark: boolean; openGen: number; active: boolean; compact?: boolean; labels?: PanelLabels }) {
   const t = TH[dark ? "dark" : "light"];
-  const [period, setPeriod] = useState<"Day" | "Week" | "Month">("Week");
+  const L = labels || EN_DEFAULT;
+  const SEG_ITEMS = [L.day, L.week, L.month] as const;
+  type PeriodKey = "Day" | "Week" | "Month";
+  const [period, setPeriod] = useState<PeriodKey>("Week");
+  // Segmented control passes the localized label back; map it to the canonical
+  // period key the rest of the panel uses.
+  const onPeriod = (v: string) => {
+    if (v === L.day) setPeriod("Day");
+    else if (v === L.month) setPeriod("Month");
+    else setPeriod("Week");
+  };
+  const periodLabel = period === "Day" ? L.day : period === "Month" ? L.month : L.week;
   const P: PeriodReport = period === "Day" ? dash.day : period === "Month" ? dash.month : dash.week;
   const M = P.metrics;
   const animTotal = useCountUp(M.totalTokens, `${period}:${openGen}`, active);
@@ -196,7 +228,7 @@ export function Panel({ dash, dark, openGen, active, compact = false }:
   const unpricedModels = models.filter((m) => !m.priced && m.tokens > 0);
   const maxM = Math.max(...tokenModels.map((m) => m.tokens), 1e-9);
   const tokenShares = sharePcts(tokenModels.map((m) => m.tokens));
-  const trendSub = { Day: "today 24h", Week: "this week", Month: "this month" }[period];
+  const trendSub = L.trendSub[period];
 
   return (
     // Embedded version: the outer 100vh scroller from the app is replaced
@@ -230,22 +262,22 @@ export function Panel({ dash, dark, openGen, active, compact = false }:
             <span style={{ font: `600 13px ${t.ui}`, color: t.text, letterSpacing: ".01em" }}>Tokenscope</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Segmented value={period} theme={t} onSelect={(v) => setPeriod(v as "Day" | "Week" | "Month")} />
-            <PanelThemeToggle dark={dark} theme={t} />
-            <PanelScreenshot theme={t} />
+            <Segmented value={periodLabel} items={[...SEG_ITEMS]} theme={t} onSelect={onPeriod} />
+            <PanelThemeToggle dark={dark} theme={t} labels={L} />
+            <PanelScreenshot theme={t} label={L.screenshot} />
           </div>
         </div>
         <div style={{ padding: "14px 15px 15px" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 10 }}>
             <div>
-              <div style={{ font: `500 10px ${t.ui}`, color: t.dim, letterSpacing: ".04em", textTransform: "uppercase" }}>Total tokens</div>
+              <div style={{ font: `500 10px ${t.ui}`, color: t.dim, letterSpacing: ".04em", textTransform: "uppercase" }}>{L.totalTokens}</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 3 }}>
                 <span style={{ font: `600 30px ${t.mono}`, color: t.text, letterSpacing: "-.01em" }}>{animTotal.toFixed(2)}<span style={{ font: `500 15px ${t.mono}`, color: t.dim, marginLeft: 2 }}>M</span></span>
                 {Math.round(M.deltaTokens) !== 0 && <Delta v={M.deltaTokens} theme={t} />}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ font: `500 10px ${t.ui}`, color: t.dim }}>Est. cost</div>
+              <div style={{ font: `500 10px ${t.ui}`, color: t.dim }}>{L.estCost}</div>
               <div style={{ font: `600 18px ${t.mono}`, color: t.accent, marginTop: 2 }}>${M.cost.toFixed(2)}</div>
             </div>
           </div>
@@ -255,30 +287,31 @@ export function Panel({ dash, dark, openGen, active, compact = false }:
               <div style={{ flexGrow: Math.max(M.outputTokens, 1e-6), flexBasis: 0, minWidth: 4, background: t.accentSoft }} />
             </>}
           </div>
-          <SplitLegend t={t} inputM={M.inputTokens + M.cacheTokens} outputM={M.outputTokens} cachedPct={pct(M.cacheTokens, M.totalTokens)} />
-          <BarChart data={P.series} theme={t} height={84} />
+          <SplitLegend t={t} inputM={M.inputTokens + M.cacheTokens} outputM={M.outputTokens} cachedPct={pct(M.cacheTokens, M.totalTokens)} labels={L} />
+          <BarChart data={P.series} theme={t} height={84} labels={L} />
           <SectionRule t={t} m="14px 0 10px" />
-          <div style={{ marginBottom: 4 }}><Label t={t}>Tokens by model</Label></div>
-          {tokenModels.length === 0 && <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint, padding: "4px 0" }}>No usage in this period</div>}
+          <div style={{ marginBottom: 4 }}><Label t={t}>{L.tokensByModel}</Label></div>
+          {tokenModels.length === 0 && <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint, padding: "4px 0" }}>{L.emptyUsage}</div>}
           {tokenModels.map((m, i) => <ModelRow key={i} m={m} max={maxM} theme={t} share={tokenShares[i]} />)}
           {!compact && <>
             <SectionRule t={t} m="10px 0 10px" />
-            <div style={{ marginBottom: 8 }}><Label t={t}>Cost by model</Label></div>
+            <div style={{ marginBottom: 8 }}><Label t={t}>{L.costByModel}</Label></div>
             {costModels.length > 0
               ? <CostDonut models={costModels} theme={t} size={100} thickness={15} />
               : <div style={{ font: `500 10.5px ${t.mono}`, color: t.faint }}>—</div>}
             {unpricedModels.length > 0 && (
               <div style={{ marginTop: 9, font: `500 9.5px/1.5 ${t.mono}`, color: t.faint }}>
-                {unpricedModels.length} model{unpricedModels.length > 1 ? "s" : ""} without pricing data (cost not counted):{" "}
+                {unpricedModels.length}{" "}
+                {unpricedModels.length > 1 ? L.unpriced.pluralSuffix : L.unpriced.singularSuffix}{" "}
                 <span style={{ color: t.dim }}>{unpricedModels.map((m) => m.name).join(", ")}</span>
               </div>
             )}
             <SectionRule t={t} m="12px 0 12px" />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              <MiniStat label="Requests" value={fmtInt(M.requests)} sub={`${M.sessions} sessions`} theme={t}>
+              <MiniStat label={L.requests} value={fmtInt(M.requests)} sub={`${M.sessions} ${L.sessionsSuffix}`} theme={t}>
                 <Sparkline values={P.reqTrend.length ? P.reqTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
               </MiniStat>
-              <MiniStat label="Cost trend" value={`$${M.cost.toFixed(2)}`} sub={trendSub} theme={t} accent={t.accent}>
+              <MiniStat label={L.costTrend} value={`$${M.cost.toFixed(2)}`} sub={trendSub} theme={t} accent={t.accent}>
                 <Sparkline values={P.costTrend.length ? P.costTrend : [0, 0]} theme={t} width={52} height={20} accent={t.accent} />
               </MiniStat>
             </div>
@@ -286,31 +319,31 @@ export function Panel({ dash, dark, openGen, active, compact = false }:
               <>
                 <SectionRule t={t} />
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
-                  <Label t={t}>MCP calls</Label>
-                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.mcpCalls)}</span> · {M.servers} servers</span>
+                  <Label t={t}>{L.mcpCalls}</Label>
+                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.mcpCalls)}</span> · {M.servers} {L.servers}</span>
                 </div>
                 {P.mcp.length > 0
-                  ? <BarList key={period} items={P.mcp} theme={t} accent={t.accent} />
-                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No MCP calls in this period</div>}
+                  ? <BarList key={period} items={P.mcp} theme={t} accent={t.accent} labels={L} />
+                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>{L.emptyMcp}</div>}
               </>
             )}
             {M.skills > 0 && (
               <>
                 <SectionRule t={t} />
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 7 }}>
-                  <Label t={t}>Skill calls</Label>
-                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.skillCalls)}</span> · {M.skills} skills</span>
+                  <Label t={t}>{L.skillCalls}</Label>
+                  <span style={{ font: `500 10px ${t.mono}`, color: t.faint, whiteSpace: "nowrap" }}><span style={{ color: t.text, fontWeight: 600 }}>{fmtInt(M.skillCalls)}</span> · {M.skills} {L.skills}</span>
                 </div>
                 {P.skills.length > 0
-                  ? <BarList key={period} items={P.skills} theme={t} accent={t.accent} />
-                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>No skill calls in this period</div>}
+                  ? <BarList key={period} items={P.skills} theme={t} accent={t.accent} labels={L} />
+                  : <div style={{ font: `500 10px ${t.mono}`, color: t.faint, padding: "2px 0" }}>{L.emptySkill}</div>}
               </>
             )}
             <SectionRule t={t} />
-            <div style={{ marginBottom: 9 }}><Label t={t}>Daily activity</Label></div>
-            <Heatmap days={dash.heatmap} theme={t} accent={t.accent} />
+            <div style={{ marginBottom: 9 }}><Label t={t}>{L.dailyActivity}</Label></div>
+            <Heatmap days={dash.heatmap} theme={t} accent={t.accent} labels={L} />
             <div style={{ marginTop: 12, font: `500 8.5px ${t.mono}`, color: t.faint, textAlign: "center" }}>
-              Est. cost via models.dev / LiteLLM · estimate
+              {L.footerEstimate}
             </div>
           </>}
         </div>

@@ -2,8 +2,8 @@
 
 // The Breakdowns bento renders each tile with the real Tokenscope chart
 // components from components/tokenscope/charts.tsx — no homemade re-skin.
-// Data comes from the same DEMO_DASHBOARD snapshot the hero panel uses, so
-// the numbers in the bento always match the panel.
+// Data comes from the same dashboard snapshot the hero panel uses, so the
+// numbers in the bento always match the panel.
 
 import {
   BarList,
@@ -12,11 +12,12 @@ import {
   MiniStat,
   Sparkline,
 } from "./tokenscope/charts";
-import { DEMO_DASHBOARD, fmtInt, TH, type Theme } from "@/lib/tokenscope-data";
+import { buildDemoDashboard, fmtInt, TH, type Theme } from "@/lib/tokenscope-data";
 import { Reveal } from "./Reveal";
 import { useCountUp } from "./useCountUp";
 import { useInView } from "./useInView";
 import { useTheme } from "./useTheme";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Panel-style uppercase mini label, inline-styled so it matches the rest of
 // the embedded chart typography (which is all inline-styled too).
@@ -52,10 +53,14 @@ function ListTotal({ t, calls, count, unit }: { t: Theme; calls: number; count: 
   );
 }
 
-export function Breakdowns() {
+export function Breakdowns({ locale }: { locale: Locale }) {
+  const dict = getDict(locale);
+  const labels = dict.breakdowns;
+  const panelLabels = dict.panel;
   const { dark } = useTheme();
   const t = TH[dark ? "dark" : "light"];
-  const week = DEMO_DASHBOARD.week;
+  const dash = buildDemoDashboard(locale);
+  const week = dash.week;
   const M = week.metrics;
   const costModels = week.models.filter((m) => m.cost > 0);
   // Count the cache % up from 0 when its tile scrolls into view.
@@ -68,11 +73,10 @@ export function Breakdowns() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            Daily, weekly, monthly token cost breakdowns.
+            {labels.h2}
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
-            Tokens by model, by MCP call, by Skill call. Spot which models drain your budget and
-            which tools you installed but never touch.
+            {labels.intro}
           </p>
         </Reveal>
 
@@ -83,9 +87,9 @@ export function Breakdowns() {
             delayIndex={0}
             className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
           >
-            <h3 className="mb-1 text-[17px] font-semibold">Cost by model</h3>
+            <h3 className="mb-1 text-[17px] font-semibold">{labels.costByModel.title}</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
-              Where the dollars actually go, per period.
+              {labels.costByModel.sub}
             </div>
             <CostDonut models={costModels} theme={t} size={132} thickness={18} />
             <div
@@ -97,17 +101,17 @@ export function Breakdowns() {
               }}
             >
               <MiniStat
-                label="Requests"
+                label={labels.requests}
                 value={fmtInt(M.requests)}
-                sub={`${M.sessions} sessions`}
+                sub={`${M.sessions} ${labels.sessionsSuffix}`}
                 theme={t}
               >
                 <Sparkline values={week.reqTrend} theme={t} width={52} height={20} accent={t.accent} />
               </MiniStat>
               <MiniStat
-                label="Cost trend"
+                label={labels.costTrend}
                 value={`$${M.cost.toFixed(2)}`}
-                sub="this week"
+                sub={labels.thisWeek}
                 theme={t}
                 accent={t.accent}
               >
@@ -122,9 +126,9 @@ export function Breakdowns() {
             delayIndex={1}
             className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-7"
           >
-            <h3 className="mb-1 text-[17px] font-semibold">Tools you actually use</h3>
+            <h3 className="mb-1 text-[17px] font-semibold">{labels.tools.title}</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
-              Only the MCP servers and Skills you installed yourself.
+              {labels.tools.sub}
             </div>
             <div className="grid grid-cols-1 gap-7 sm:grid-cols-2">
               <div>
@@ -136,18 +140,18 @@ export function Breakdowns() {
                     marginBottom: 10,
                   }}
                 >
-                  <PanelLabel t={t}>MCP calls</PanelLabel>
-                  <ListTotal t={t} calls={M.mcpCalls} count={M.servers} unit="servers" />
+                  <PanelLabel t={t}>{labels.mcpCalls}</PanelLabel>
+                  <ListTotal t={t} calls={M.mcpCalls} count={M.servers} unit={labels.servers} />
                 </div>
                 {week.mcp.length > 0 ? (
-                  <BarList items={week.mcp} theme={t} accent={t.accent} animate />
+                  <BarList items={week.mcp} theme={t} accent={t.accent} animate labels={panelLabels} />
                 ) : (
                   <div style={{ font: `500 11px ${t.mono}`, color: t.faint, padding: "2px 0" }}>
-                    No MCP calls this week
+                    {labels.emptyMcp}
                   </div>
                 )}
                 <div className="mt-3.5 font-mono text-[11px] leading-[1.5] text-faint">
-                  Anthropic&apos;s bundled MCP and every built-in tool are filtered out.
+                  {labels.mcpFootnote}
                 </div>
               </div>
               <div>
@@ -159,22 +163,22 @@ export function Breakdowns() {
                     marginBottom: 10,
                   }}
                 >
-                  <PanelLabel t={t}>Skill calls</PanelLabel>
-                  <ListTotal t={t} calls={M.skillCalls} count={M.skills} unit="skills" />
+                  <PanelLabel t={t}>{labels.skillCalls}</PanelLabel>
+                  <ListTotal t={t} calls={M.skillCalls} count={M.skills} unit={labels.skills} />
                 </div>
                 {week.skills.length > 0 ? (
-                  <BarList items={week.skills} theme={t} accent={t.accent} animate />
+                  <BarList items={week.skills} theme={t} accent={t.accent} animate labels={panelLabels} />
                 ) : (
                   <div style={{ font: `500 11px ${t.mono}`, color: t.faint, padding: "2px 0" }}>
-                    No skill calls this week
+                    {labels.emptySkills}
                   </div>
                 )}
                 <div className="mt-3.5 font-mono text-[11px] leading-[1.5] text-faint">
-                  Read from your own{" "}
+                  {labels.skillFootnotePrefix}{" "}
                   <code className="font-mono text-[11px] text-accent">
-                    ~/.claude/skills/
+                    {labels.skillFootnotePath}
                   </code>{" "}
-                  directory.
+                  {labels.skillFootnoteSuffix}
                 </div>
               </div>
             </div>
@@ -186,11 +190,11 @@ export function Breakdowns() {
             delayIndex={2}
             className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-7"
           >
-            <h3 className="mb-1 text-[17px] font-semibold">A year of activity</h3>
+            <h3 className="mb-1 text-[17px] font-semibold">{labels.year.title}</h3>
             <div className="mb-5 text-[13.5px] leading-[1.5] text-dim">
-              Daily token volume across the last twelve months.
+              {labels.year.sub}
             </div>
-            <Heatmap days={DEMO_DASHBOARD.heatmap} theme={t} accent={t.accent} animate />
+            <Heatmap days={dash.heatmap} theme={t} accent={t.accent} animate labels={panelLabels} months={dict.dashboard.months} />
           </Reveal>
 
           {/* Cache % — sits next to the heatmap on the same row (5 cols). */}
@@ -200,17 +204,16 @@ export function Breakdowns() {
             className="relative overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card p-5.5 md:col-span-5"
           >
             <div ref={cacheRef}>
-              <h3 className="mb-1 text-[17px] font-semibold">Cache changes everything</h3>
+              <h3 className="mb-1 text-[17px] font-semibold">{labels.cache.title}</h3>
               <div
                 className="font-mono font-semibold leading-none tracking-[-0.03em] text-accent"
                 style={{ fontSize: "clamp(56px,9vw,84px)" }}
               >
                 {Math.round(cacheCount)}
-                <span className="ml-0.5 text-[0.42em] text-dim">% cached</span>
+                <span className="ml-0.5 text-[0.42em] text-dim">{labels.cache.pctSuffix}</span>
               </div>
               <div className="mt-4.5 font-mono text-[11px] leading-[1.5] text-faint">
-                Heavily cached days show huge token counts but a modest bill. Cache hits are billed
-                at their own cheaper rate, not as fresh input.
+                {labels.cache.footnote}
               </div>
             </div>
           </Reveal>

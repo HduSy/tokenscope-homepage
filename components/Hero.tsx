@@ -1,12 +1,14 @@
 import { HeroPanel } from "./HeroPanel";
 import { InstallCtas } from "./InstallCtas";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Hero: copy on the left, live panel preview on the right. The accent glow
 // is `position: fixed` so it stays anchored to the viewport as the page
 // scrolls — feels like ambient lighting that the document slides past,
 // rather than a decoration that falls off-screen with the hero.
 
-export function Hero() {
+export function Hero({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
   return (
     <header id="top" className="relative">
       <div
@@ -18,21 +20,21 @@ export function Hero() {
         <div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 font-mono text-xs text-dim">
             <span className="h-[7px] w-[7px] rounded-[2px] bg-accent" />
-            macOS menu-bar app for Claude Code
+            {t.hero.pill}
           </span>
           <h1
             className="mt-5.5 max-w-[13ch] font-display font-semibold"
             style={{ fontSize: "clamp(40px,6vw,64px)" }}
           >
-            See what your Claude Code <em className="not-italic text-accent">actually costs</em>.
+            {t.hero.h1Lead}{" "}
+            <em className="not-italic text-accent">{t.hero.h1Accent}</em>.
           </h1>
           <p className="mt-5 max-w-[50ch] text-[18px] leading-[1.55] text-dim">
-            A menu-bar app showing daily token cost, per-model breakdown, and MCP and Skill call
-            counts. Read-only, zero intrusion.
+            {t.hero.sub}
           </p>
-          <InstallCtas className="mt-7" />
+          <InstallCtas locale={locale} className="mt-7" />
         </div>
-        <HeroPanel />
+        <HeroPanel locale={locale} />
       </div>
     </header>
   );

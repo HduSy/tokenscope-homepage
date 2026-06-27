@@ -2,12 +2,14 @@
 
 import { scrollToTop } from "@/lib/lenis";
 import { Icon } from "./Icon";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Small "Back to top ↑" affordance pinned to the bottom-right of the
 // BrandSignoff slab. Routes through Lenis's scrollTo (see lib/lenis.ts) so it
 // never races the smooth-scroll loop — one click always lands.
 
-export function BackToTop() {
+export function BackToTop({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
   const onClick = () => {
     scrollToTop();
   };
@@ -17,7 +19,7 @@ export function BackToTop() {
       onClick={onClick}
       className="inline-flex items-center gap-2 text-[13px] font-medium text-dim transition-colors hover:text-text"
     >
-      Back to top
+      {t.nav.backToTop}
       <Icon name="arrow-circle-up" size={16} />
     </button>
   );

@@ -2,7 +2,10 @@
 
 // Ported 1:1 from the Tokenscope app's src/charts.tsx. Same component API,
 // same inline-style approach — keeps the panel pixel-identical to the real
-// macOS app.
+// macOS app. The only homepage-specific addition: optional `labels` props on
+// the charts that render free text (BarChart/Heatmap tooltips, BarList
+// expand/collapse), so the bilingual site can swap "No tokens" / "tokens" /
+// "Less" / "More" / "more" / "show less" / month abbreviations per locale.
 
 import { useId, useState, type CSSProperties } from "react";
 import { useInView } from "../useInView";
@@ -18,6 +21,31 @@ import {
   linePath,
   fmtHeatDate,
 } from "@/lib/tokenscope-data";
+import type { Dict } from "@/lib/i18n";
+
+// Subset of dict.panel used inside chart text — kept loose so callers can pass
+// just dict.panel itself without redaction. Each `labels` prop is optional;
+// when absent, the chart falls back to its original English text.
+type ChartLabels = Dict["panel"];
+
+const EN_FALLBACK: Pick<
+  ChartLabels,
+  | "tooltipNoTokens"
+  | "tooltipNoCalls"
+  | "tooltipTokensSuffix"
+  | "heatLess"
+  | "heatMore"
+  | "barListMore"
+  | "barListLess"
+> = {
+  tooltipNoTokens: "No tokens",
+  tooltipNoCalls: "No calls",
+  tooltipTokensSuffix: "tokens",
+  heatLess: "Less",
+  heatMore: "More",
+  barListMore: "more",
+  barListLess: "show less",
+};
 
 // Compact label component used by Panel sections. Exported so Breakdowns can
 // match the exact panel typography for its mini-section labels.
@@ -98,10 +126,11 @@ export function Segmented({ value, items = ["Day", "Week", "Month"], theme, onSe
   );
 }
 
-export function BarChart({ data, theme, height = 96, accent, accentSoft, radius = 3 }:
-  { data: SeriesPoint[]; theme: Theme; height?: number; accent?: string; accentSoft?: string; radius?: number }) {
+export function BarChart({ data, theme, height = 96, accent, accentSoft, radius = 3, labels }:
+  { data: SeriesPoint[]; theme: Theme; height?: number; accent?: string; accentSoft?: string; radius?: number; labels?: ChartLabels }) {
   const t = theme;
   accent = accent || t.accent; accentSoft = accentSoft || t.accentSoft;
+  const L = labels || EN_FALLBACK;
   const max = Math.max(...data.map((d) => d.input + d.cache + d.output), 1e-9);
   const n = data.length;
   const gapPct = Math.max(0.8, Math.min(6, 32 / n));
@@ -152,7 +181,7 @@ export function BarChart({ data, theme, height = 96, accent, accentSoft, radius 
           font: `500 10px ${t.mono}`, whiteSpace: "nowrap", pointerEvents: "none", zIndex: 9999,
           boxShadow: "0 4px 14px rgba(0,0,0,0.35)" }}>
           <span style={{ color: accent, fontWeight: 600 }}>
-            {(() => { const tot = hi.input + hi.cache + hi.output; return tot === 0 ? "No tokens" : fmtTokens(tot) + " tokens"; })()}
+            {(() => { const tot = hi.input + hi.cache + hi.output; return tot === 0 ? L.tooltipNoTokens : fmtTokens(tot) + " " + L.tooltipTokensSuffix; })()}
           </span>
           <span style={{ opacity: 0.7 }}> · {hi.full}</span>
         </div>
@@ -261,9 +290,10 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
   );
 }
 
-export function BarList({ items, theme, accent, limit = 5, animate = false }:
-  { items: NamedCount[]; theme: Theme; accent?: string; limit?: number; animate?: boolean }) {
+export function BarList({ items, theme, accent, limit = 5, animate = false, labels }:
+  { items: NamedCount[]; theme: Theme; accent?: string; limit?: number; animate?: boolean; labels?: ChartLabels }) {
   const t = theme; accent = accent || t.accent;
+  const L = labels || EN_FALLBACK;
   const [open, setOpen] = useState(false);
   const shown = items.slice(0, open ? items.length : limit);
   const max = items.reduce((m, i) => Math.max(m, i.count), 0) || 1;
@@ -303,13 +333,13 @@ export function BarList({ items, theme, accent, limit = 5, animate = false }:
       {more > 0 && (
         <div onClick={() => setOpen(true)} style={{ font: `500 9.5px ${t.ui}`, color: t.faint, paddingTop: 4, cursor: "pointer", userSelect: "none" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = t.dim)} onMouseLeave={(e) => (e.currentTarget.style.color = t.faint)}>
-          +{more} more
+          +{more} {L.barListMore}
         </div>
       )}
       {open && items.length > limit && (
         <div onClick={() => setOpen(false)} style={{ font: `500 9.5px ${t.ui}`, color: t.faint, paddingTop: 4, cursor: "pointer", userSelect: "none" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = t.dim)} onMouseLeave={(e) => (e.currentTarget.style.color = t.faint)}>
-          show less
+          {L.barListLess}
         </div>
       )}
     </div>
@@ -322,9 +352,10 @@ function ramp(accent: string, lvl: number, gridLine: string, card: string) {
   return `color-mix(in srgb, ${accent} ${Math.round(op * 100)}%, ${card})`;
 }
 
-export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
-  { days: HeatDay[]; theme: Theme; accent?: string; gap?: number; animate?: boolean }) {
+export function Heatmap({ days, theme, accent, gap = 2, animate = false, labels, months }:
+  { days: HeatDay[]; theme: Theme; accent?: string; gap?: number; animate?: boolean; labels?: ChartLabels; months?: string[] }) {
   const t = theme; accent = accent || t.accent;
+  const L = labels || EN_FALLBACK;
   const [hi, setHi] = useState<HeatDay | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
   // `animate` is opt-in: stagger cells in left-to-right once in view. Reuses
@@ -356,7 +387,7 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
       }
     }
   });
-  const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const MN = months || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const onCell = (d: HeatDay, e: React.MouseEvent) => {
     const r = (e.target as HTMLElement).getBoundingClientRect();
     setHi(d); setTip({ x: r.left + r.width / 2, y: r.top });
@@ -389,9 +420,9 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
         ))}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "flex-end", marginTop: 8, font: `500 8.5px ${t.mono}`, color: t.faint }}>
-        <span>Less</span>
+        <span>{L.heatLess}</span>
         {[0, 1, 2, 3, 4].map((l) => (<span key={l} style={{ width: 9, height: 9, borderRadius: 2, background: ramp(accent!, l, t.gridLine, t.card) }} />))}
-        <span>More</span>
+        <span>{L.heatMore}</span>
       </div>
       {hi && (
         <div style={{
@@ -401,7 +432,7 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false }:
           background: t.tip, color: "#fff", borderRadius: 6, padding: "5px 8px",
           font: `500 10px ${t.mono}`, whiteSpace: "nowrap", pointerEvents: "none", zIndex: 9999,
           boxShadow: "0 4px 14px rgba(0,0,0,0.35)" }}>
-          <span style={{ color: accent, fontWeight: 600 }}>{hi.tokens === 0 ? "No calls" : fmtTokens(hi.tokens) + " tokens"}</span>
+          <span style={{ color: accent, fontWeight: 600 }}>{hi.tokens === 0 ? L.tooltipNoCalls : fmtTokens(hi.tokens) + " " + L.tooltipTokensSuffix}</span>
           <span style={{ opacity: 0.7 }}> · {fmtHeatDate(hi.date)}</span>
         </div>
       )}

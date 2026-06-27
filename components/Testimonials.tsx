@@ -1,4 +1,5 @@
 import { Reveal } from "./Reveal";
+import { getDict, type Locale } from "@/lib/i18n";
 
 // Auto-looping testimonial marquee. A row of short developer notes scrolls
 // continuously, pauses on hover, and freezes (becomes manually scrollable)
@@ -14,45 +15,11 @@ type Review = { name: string; role?: string; avatar?: string; quote: string };
 
 // Real user reviews. @alifeiliu shared separate takes on the tool - each one
 // becomes its own card, all under the same handle, role, and avatar.
-const AUTHOR = {
-  name: "alifeiliu",
-  role: "Full-stack (Frontend) Engineer",
-  avatar:
-    "https://pbs.twimg.com/profile_images/1818868279135313920/R_t7Z5mr_400x400.jpg",
-};
-
-const REVIEWS: Review[] = [
-  {
-    ...AUTHOR,
-    quote:
-      "Genuinely fun to use - every time your usage ticks past another 100M tokens, Tokenscope sets off this little fireworks animation 🎉. Weirdly satisfying, and it actually makes you feel like you've accomplished something.",
-  },
-  {
-    ...AUTHOR,
-    quote:
-      "The token count is spot-on. I ran Tokenscope against GLM-5.2 for a while and cross-checked with the Coding-Plan dashboard - the two lined right up. The dollar figure is an estimate, of course.",
-  },
-  {
-    ...AUTHOR,
-    quote:
-      "One thing Tokenscope is great for: seeing how many tokens you actually get out of the various Coding-Plan and subscription tiers within a refresh window. Zhipu Lite's 5h Coding-Plan comes to about 20M; ByteDance Volcano Ark's Pro 5h plan, roughly 70M.",
-  },
-  {
-    ...AUTHOR,
-    quote:
-      "Tokenscope's Tokens/Cost by Model view makes it dead easy to compare how pricey different models are. Same token usage, GLM-5.2 runs about a seventh of what Claude-Opus-4-8 costs.",
-  },
-  {
-    ...AUTHOR,
-    quote:
-      "Tokenscope gives you daily, weekly, and monthly breakdowns - the weekly and monthly views even reveal your own AI-usage habits and patterns, which is pretty cool. Plus there's a GitHub-style commit heatmap that shows the full picture of how much you've poured into AI.",
-  },
-  {
-    ...AUTHOR,
-    quote:
-      "Tokenscope's screenshot feature is really handy too - easy to share straight to your socials, so everyone can compare notes and show off their 'report cards'.",
-  },
-];
+// The author identity (name, handle, avatar URL) stays locale-invariant;
+// the role label and the quote text come from the dict.
+const AUTHOR_NAME = "alifeiliu";
+const AUTHOR_AVATAR =
+  "https://pbs.twimg.com/profile_images/1818868279135313920/R_t7Z5mr_400x400.jpg";
 
 function initials(name: string) {
   return name
@@ -64,7 +31,8 @@ function initials(name: string) {
 }
 
 // Highlights every "Tokenscope" mention in the theme accent green so the
-// product name pops inside each review.
+// product name pops inside each review. The split regex matches the brand
+// name in both locale strings (it's kept English in the Chinese translations).
 function Quote({ text }: { text: string }) {
   const parts = text.split(/(Tokenscope)/gi);
   return (
@@ -132,7 +100,14 @@ function Card({ r }: { r: Review }) {
   );
 }
 
-export function Testimonials() {
+export function Testimonials({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
+  const REVIEWS: Review[] = t.testimonials.quotes.map((q) => ({
+    name: AUTHOR_NAME,
+    role: t.testimonials.role,
+    avatar: AUTHOR_AVATAR,
+    quote: q,
+  }));
   // Duplicate the set so the track can translate -50% for a seamless loop.
   const loop = [...REVIEWS, ...REVIEWS];
 
@@ -141,28 +116,33 @@ export function Testimonials() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            Reviews from developers tracking their Claude Code cost.
+            {t.testimonials.h2}
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
-            A few notes from developers who installed Tokenscope and kept it.
+            {t.testimonials.intro}
           </p>
         </Reveal>
       </div>
 
       <div className="marquee">
         <div className="marquee-track">
-          {loop.map((r, i) => (
-            <a
-              key={i}
-              href={`https://x.com/${r.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`View @${r.name} on X`}
-              className="inline-flex rounded-[var(--radius-lg)] outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <Card r={r} />
-            </a>
-          ))}
+          {loop.map((r, i) => {
+            // Chinese aria is "在 X 上查看 @name", English is "View @name on X".
+            // Join with single spaces and trim any empty suffix.
+            const aria = `${t.testimonials.ariaPrefix} @${r.name} ${t.testimonials.ariaSuffix}`.trim();
+            return (
+              <a
+                key={i}
+                href={`https://x.com/${r.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={aria}
+                className="inline-flex rounded-[var(--radius-lg)] outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <Card r={r} />
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
