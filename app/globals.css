@@ -304,3 +304,26 @@ html.js .heat-anim:not(.in) {
   contain-intrinsic-size: auto 480px;
 }
 
+/* Isolate the sticky nav from useThemeTransition's clip-path view-transition.
+   Without this, the entire <html> is captured as the root snapshot, and on
+   mobile (iOS Safari especially) the sticky nav can appear to shift sideways
+   or jump during the 1.3s disc reveal because position:sticky doesn't
+   replay inside the snapshot the same way live layout does — the disc reveal
+   crops the new theme's content and reveals it gradually, but the nav is
+   part of that cropped layer, so it visibly slides into place behind the
+   wavefront.
+
+   Giving the nav its own view-transition-name pulls it out as a separate
+   layer that crossfades smoothly on top of the disc animation, so its
+   position and width are guaranteed stable across the transition. */
+.sticky-nav {
+  view-transition-name: nav;
+}
+::view-transition-old(nav),
+::view-transition-new(nav) {
+  /* Quick crossfade in place — no clip-path. */
+  animation-duration: 200ms;
+  animation-timing-function: ease;
+  mix-blend-mode: normal;
+}
+

@@ -28,7 +28,7 @@ export function Nav({ locale }: { locale: Locale }) {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-border backdrop-blur-md"
+      className="sticky-nav sticky top-0 z-50 border-b border-border backdrop-blur-md"
       style={{
         background: "color-mix(in srgb, var(--color-bg) 38%, transparent)",
         WebkitBackdropFilter: "saturate(160%) blur(16px)",
