@@ -16,15 +16,15 @@ export function Hero({ locale }: { locale: Locale }) {
         className="pointer-events-none fixed inset-0 z-0"
         style={{ background: "var(--accent-glow)" }}
       />
-      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-6 pt-18 pb-20 md:grid-cols-[1.05fr_0.95fr] md:gap-10 md:pt-21 md:pb-24 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="relative z-10 mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-6 pt-18 pb-20 md:grid-cols-[1.3fr_0.7fr] md:gap-10 md:pt-21 md:pb-24 lg:grid-cols-[1.35fr_0.65fr]">
         <div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 font-mono text-xs text-dim">
             <span className="h-[7px] w-[7px] rounded-[2px] bg-accent" />
             {t.hero.pill}
           </span>
           <h1
-            className="mt-5.5 max-w-[13ch] font-display font-semibold"
-            style={{ fontSize: "clamp(40px,6vw,64px)" }}
+            className="mt-5.5 max-w-[26ch] font-display font-semibold"
+            style={{ fontSize: "clamp(36px,6vw,64px)" }}
           >
             {t.hero.h1Lead}{" "}
             <em className="not-italic text-accent">{t.hero.h1Accent}</em>.
