@@ -63,7 +63,7 @@ export function Footer() {
               Tokenscope
             </AnchorLink>
             <p className="mt-2.5 max-w-[26ch] text-[13.5px] text-dim">
-              Token usage for your Claude CLI, in the macOS menu bar.
+              Track your Claude Code token cost, in the macOS menu bar.
             </p>
           </div>
           {cols.map((col) => (

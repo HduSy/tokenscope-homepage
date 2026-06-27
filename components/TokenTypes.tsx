@@ -45,7 +45,7 @@ export function TokenTypes() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            How a request turns into dollars.
+            How your Claude Code token cost is calculated.
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
             Each JSONL request logs four token counts. Tokenscope rolls them up per session,

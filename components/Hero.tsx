@@ -18,17 +18,17 @@ export function Hero() {
         <div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 font-mono text-xs text-dim">
             <span className="h-[7px] w-[7px] rounded-[2px] bg-accent" />
-            macOS menu-bar app for Claude CLI
+            macOS menu-bar app for Claude Code
           </span>
           <h1
             className="mt-5.5 max-w-[13ch] font-display font-semibold"
             style={{ fontSize: "clamp(40px,6vw,64px)" }}
           >
-            See what your Claude CLI <em className="not-italic text-accent">actually costs</em>.
+            See what your Claude Code <em className="not-italic text-accent">actually costs</em>.
           </h1>
           <p className="mt-5 max-w-[50ch] text-[18px] leading-[1.55] text-dim">
-            A menu-bar app showing daily token count, estimated cost, and per-model, MCP, and
-            Skill breakdown. Read-only, zero intrusion.
+            A menu-bar app showing daily token cost, per-model breakdown, and MCP and Skill call
+            counts. Read-only, zero intrusion.
           </p>
           <InstallCtas className="mt-7" />
         </div>

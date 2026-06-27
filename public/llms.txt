@@ -1,0 +1,21 @@
+# Tokenscope
+
+> A free, open-source macOS menu-bar app that shows Claude Code token cost, per-model breakdown, and MCP and Skill call counts, by reading the JSONL logs Claude Code already writes locally. No API key, no telemetry, MIT licensed.
+
+Tokenscope is a read-only macOS menu-bar app for developers using Anthropic's Claude Code (formerly known as Claude CLI). It parses the usage logs under ~/.claude/projects/, prices each request against per-million-token rates from models.dev (with a LiteLLM fallback and a built-in snapshot when offline), and surfaces total tokens, estimated cost, daily, weekly, and monthly trends, per-model cost, MCP-server and Skill call counts, and a GitHub-style daily activity heatmap. It sends nothing over the network and needs no account or API key.
+
+## Key facts
+
+- Price: Free. MIT licensed, no paid tier, no telemetry.
+- Platform: macOS, running in the menu bar.
+- Install: `brew install --cask hdusy/tokenscope/tokenscope` via Homebrew, or the `.dmg` from GitHub Releases.
+- Privacy: reads local JSONL logs only. No network calls, no account, no API key.
+- Source code: https://github.com/HduSy/tokenscope
+
+## Links
+
+- [Tokenscope homepage](https://tokenscope.app/): what it does, how cost is calculated, and install steps.
+- [How Claude Code token cost is calculated](https://tokenscope.app/#pricing): each token count multiplied by its per-million rate, then summed.
+- [Frequently asked questions](https://tokenscope.app/#faq): privacy, cost accuracy, performance, and supported tools.
+- [GitHub repository](https://github.com/HduSy/tokenscope): source, issues, and documentation.
+- [Releases](https://github.com/HduSy/tokenscope/releases): downloadable `.dmg` builds.

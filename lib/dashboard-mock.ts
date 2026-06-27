@@ -102,7 +102,7 @@ const splitSeries = (raw: RawPt[]): SeriesPoint[] =>
   }));
 
 // ── MCP / Skill base lists (week totals); scale by period.mcpCalls etc. ─
-// Top 5 only. Each list sums to 10 calls / week — a realistic Claude CLI
+// Top 5 only. Each list sums to 10 calls / week — a realistic Claude Code
 // hobbyist load. Numbers scale up for Month / down for Day via scaleCalls.
 //
 // MCP server names match the identifiers from each project's official MCP
@@ -176,7 +176,7 @@ function splitMetrics(m: DesignMetrics): Metrics {
 
 const DAY_DM: DesignMetrics = {
   totalTokens: 1.94, inputTokens: 1.27, outputTokens: 0.67, cost: 7.2,
-  // Realistic Claude CLI daily activity: a couple of tool invocations and
+  // Realistic Claude Code daily activity: a couple of tool invocations and
   // a couple of skill calls. Skill totals match the SKILL_BASE shape, MCP
   // totals match MCP_BASE — they're intentionally different distributions
   // so the two BarLists don't look like copies of each other.

@@ -141,7 +141,7 @@ export function Testimonials() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            From the people running it daily.
+            Reviews from developers tracking their Claude Code cost.
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
             A few notes from developers who installed Tokenscope and kept it.

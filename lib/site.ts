@@ -5,6 +5,6 @@
 export const SITE_URL = "https://tokenscope.app";
 export const SITE_NAME = "Tokenscope";
 export const SITE_TAGLINE =
-  "Claude CLI token usage, in your macOS menu bar";
+  "Claude Code token cost, in your macOS menu bar";
 export const SITE_DESCRIPTION =
-  "A macOS menu-bar app that shows your Claude CLI daily token count, estimated cost, and per-model, MCP, and Skill breakdown. Read-only, zero intrusion.";
+  "A macOS menu-bar app that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.";

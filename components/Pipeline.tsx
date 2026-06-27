@@ -44,10 +44,10 @@ export function Pipeline() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            Read-only by design.
+            Read-only by design — no telemetry, no API key.
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
-            Tokenscope reads the JSONL logs your Claude CLI already writes to disk. No API keys.
+            Tokenscope reads the JSONL logs your Claude Code already writes to disk. No API keys.
             No calls to Anthropic. Nothing leaves your Mac.
           </p>
         </Reveal>

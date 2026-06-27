@@ -9,7 +9,7 @@ import { ImageResponse } from "next/og";
 // Satori constraint: every <div> with children must declare display:"flex"
 // (no <br>, no implicit block layout), so the markup is nested flex boxes.
 
-export const alt = "Tokenscope — Claude CLI token usage, in your macOS menu bar";
+export const alt = "Tokenscope — Claude Code token cost, in your macOS menu bar";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -68,11 +68,11 @@ export default function OpengraphImage() {
               letterSpacing: "-2px",
             }}
           >
-            <div style={{ display: "flex" }}>See what your Claude CLI</div>
+            <div style={{ display: "flex" }}>See what your Claude Code</div>
             <div style={{ display: "flex", color: "#27b06e" }}>actually costs.</div>
           </div>
           <div style={{ display: "flex", fontSize: 30, color: "rgba(255,255,255,0.6)" }}>
-            Claude CLI token usage, in your macOS menu bar.
+            Claude Code token cost, in your macOS menu bar.
           </div>
         </div>
       </div>

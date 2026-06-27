@@ -18,7 +18,7 @@ const FAQS: Faq[] = [
     q: "Does Tokenscope send any of my data over the network?",
     a: (
       <>
-        No. It reads the JSONL logs your Claude CLI already writes to{" "}
+        No. It reads the JSONL logs your Claude Code already writes to{" "}
         <code className={code}>~/.claude/projects/</code>, prices them against a locally cached
         snapshot of models.dev / LiteLLM, and renders the result in your menu bar. No telemetry,
         no account, no API key.
@@ -63,7 +63,7 @@ const FAQS: Faq[] = [
     q: "What about Cursor, Codex CLI, or other terminals?",
     a: (
       <>
-        Today only Claude CLI&apos;s JSONL format is parsed. Other tools write different shapes —
+        Today only Claude Code&apos;s JSONL format is parsed. Other tools write different shapes —
         if you want one supported, open an issue on{" "}
         <a
           href="https://github.com/HduSy/tokenscope/issues"
