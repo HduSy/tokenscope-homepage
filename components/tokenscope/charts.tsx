@@ -7,7 +7,7 @@
 // expand/collapse), so the bilingual site can swap "No tokens" / "tokens" /
 // "Less" / "More" / "more" / "show less" / month abbreviations per locale.
 
-import { useId, useState, type CSSProperties } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 import { useInView } from "../useInView";
 import {
   Theme,
@@ -46,6 +46,25 @@ const EN_FALLBACK: Pick<
   barListMore: "more",
   barListLess: "show less",
 };
+
+// On touch devices, a tap fires synthetic mouseenter but lift / slide-off
+// often skips mouseleave entirely, so the tooltip gets stuck after the
+// finger is gone. While a tooltip is showing, listen on the document for
+// touchend / touchcancel and clear the hover state — that fires reliably
+// when the finger leaves the screen no matter where the tap started.
+// Passive listeners (we never preventDefault) so they don't interfere
+// with native touch scrolling on the chart container.
+function useTouchDismiss(active: boolean, clear: () => void) {
+  useEffect(() => {
+    if (!active) return;
+    document.addEventListener("touchend", clear, { passive: true });
+    document.addEventListener("touchcancel", clear, { passive: true });
+    return () => {
+      document.removeEventListener("touchend", clear);
+      document.removeEventListener("touchcancel", clear);
+    };
+  }, [active, clear]);
+}
 
 // Compact label component used by Panel sections. Exported so Breakdowns can
 // match the exact panel typography for its mini-section labels.
@@ -137,6 +156,7 @@ export function BarChart({ data, theme, height = 96, accent, accentSoft, radius 
   const effRadius = n > 16 ? 1 : radius;
   const [hi, setHi] = useState<SeriesPoint | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
+  useTouchDismiss(hi !== null, () => setHi(null));
   // position:fixed so the tooltip renders above the scrolling card (not clipped).
   // Anchor to the *visible bar top* (baseline − bar height), not the full-height
   // column top, so short bars don't push the tooltip up over the legend above.
@@ -222,6 +242,7 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
   { models: ModelStat[]; theme: Theme; size?: number; thickness?: number }) {
   const t = theme;
   const [hi, setHi] = useState(-1);
+  useTouchDismiss(hi >= 0, () => setHi(-1));
   // Rank by cost (desc) and recolor by that rank — usage from most to least.
   const ranked = [...models]
     .sort((a, b) => b.cost - a.cost)
@@ -358,6 +379,7 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false, labels,
   const L = labels || EN_FALLBACK;
   const [hi, setHi] = useState<HeatDay | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
+  useTouchDismiss(hi !== null, () => setHi(null));
   // `animate` is opt-in: stagger cells in left-to-right once in view. Reuses
   // the wrapper as the observer target. Snaps to visible under reduced-motion.
   const { ref: wrapRef, inView } = useInView<HTMLDivElement>();
