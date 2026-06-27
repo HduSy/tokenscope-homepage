@@ -26,6 +26,7 @@ import {
   ModelRow,
   MiniStat,
 } from "./charts";
+import { useThemeTransition } from "../useThemeTransition";
 
 // Count up to `target`. Restarts from 0 whenever `resetKey` changes (popover
 // open / period switch); on a live value change it eases from the current
@@ -113,14 +114,27 @@ const Label = ({ t, children }: { t: Theme; children: React.ReactNode }) => (
   <span style={{ font: `600 10px ${t.ui}`, color: t.dim, letterSpacing: ".05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{children}</span>
 );
 
-function PanelThemeToggle({ dark, theme, onToggle }: { dark: boolean; theme: Theme; onToggle: () => void }) {
+function PanelThemeToggle({ dark, theme }: { dark: boolean; theme: Theme }) {
   const t = theme;
+  const transition = useThemeTransition();
+  const ref = useRef<HTMLButtonElement>(null);
   return (
-    <button onClick={onToggle} title={dark ? "Switch to light" : "Switch to dark"} aria-label="toggle theme" style={{
-      display: "inline-flex", alignItems: "center", justifyContent: "center",
-      width: 26, height: 26, borderRadius: 7, cursor: "pointer", padding: 0,
-      background: t.segBg, border: `1px solid ${t.segBorder}`, color: t.dim,
-    }}>
+    <button
+      ref={ref}
+      onClick={() => {
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        transition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+      }}
+      title={dark ? "Switch to light" : "Switch to dark"}
+      aria-label="toggle theme"
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        width: 26, height: 26, borderRadius: 7, cursor: "pointer", padding: 0,
+        background: t.segBg, border: `1px solid ${t.segBorder}`, color: t.dim,
+      }}
+    >
       {dark ? (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.dim} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="4.2" />
@@ -135,8 +149,40 @@ function PanelThemeToggle({ dark, theme, onToggle }: { dark: boolean; theme: The
   );
 }
 
-export function Panel({ dash, dark, onToggleTheme, openGen, active, compact = false }:
-  { dash: Dashboard; dark: boolean; onToggleTheme: () => void; openGen: number; active: boolean; compact?: boolean }) {
+// Decorative screenshot control for the hero. No real capture - clicking just
+// plays a quick camera-flash pulse (Web Animations API, so no CSS keyframes
+// needed) so the button reads as interactive in the demo.
+function PanelScreenshot({ theme }: { theme: Theme }) {
+  const t = theme;
+  const flashRef = useRef<HTMLSpanElement>(null);
+  return (
+    <button
+      onClick={() => {
+        flashRef.current?.animate(
+          [{ opacity: 0.85 }, { opacity: 0 }],
+          { duration: 450, easing: "ease-out" },
+        );
+      }}
+      title="Screenshot"
+      aria-label="Screenshot"
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        width: 26, height: 26, borderRadius: 7, cursor: "pointer", padding: 0,
+        background: t.segBg, border: `1px solid ${t.segBorder}`, color: t.dim,
+        position: "relative", overflow: "hidden",
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.dim} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+        <circle cx="12" cy="13" r="4" />
+      </svg>
+      <span ref={flashRef} style={{ position: "absolute", inset: 0, background: t.text, opacity: 0, pointerEvents: "none" }} />
+    </button>
+  );
+}
+
+export function Panel({ dash, dark, openGen, active, compact = false }:
+  { dash: Dashboard; dark: boolean; openGen: number; active: boolean; compact?: boolean }) {
   const t = TH[dark ? "dark" : "light"];
   const [period, setPeriod] = useState<"Day" | "Week" | "Month">("Week");
   const P: PeriodReport = period === "Day" ? dash.day : period === "Month" ? dash.month : dash.week;
@@ -185,10 +231,8 @@ export function Panel({ dash, dark, onToggleTheme, openGen, active, compact = fa
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Segmented value={period} theme={t} onSelect={(v) => setPeriod(v as "Day" | "Week" | "Month")} />
-            {/* Hide the panel-internal theme toggle in compact mode — the page
-                nav already has one, and the original landing.html panel didn't
-                include this control. */}
-            {!compact && <PanelThemeToggle dark={dark} theme={t} onToggle={onToggleTheme} />}
+            <PanelThemeToggle dark={dark} theme={t} />
+            <PanelScreenshot theme={t} />
           </div>
         </div>
         <div style={{ padding: "14px 15px 15px" }}>

@@ -234,3 +234,51 @@ html.js .heat-anim:not(.in) {
 ::view-transition-new(root) {
   z-index: 1;
 }
+
+/* Continuous testimonial marquee (components/Testimonials.tsx). The viewport
+   clips horizontally and fades both edges via a mask so cards dissolve in and
+   out instead of hard-cutting at the box edge. The track holds two copies of
+   the review set; translating it -50% lands on the second copy's start, so the
+   loop is seamless. Pure CSS — runs without JS too. Pauses on hover, and under
+   prefers-reduced-motion the animation is dropped and the row becomes manually
+   scrollable (overflow switches to auto) so the content is still reachable. */
+.marquee {
+  overflow-x: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
+  );
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 64s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}

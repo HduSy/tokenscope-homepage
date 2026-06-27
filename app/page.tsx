@@ -7,6 +7,7 @@ import { Hero } from "@/components/Hero";
 import { InstallSection } from "@/components/InstallSection";
 import { Nav } from "@/components/Nav";
 import { Pipeline } from "@/components/Pipeline";
+import { Testimonials } from "@/components/Testimonials";
 import { TokenTypes } from "@/components/TokenTypes";
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
       <TokenTypes />
       <InstallSection />
       <Faq />
+      <Testimonials />
       <FinalCta />
       <Footer />
       <BrandSignoff />

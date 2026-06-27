@@ -11,7 +11,7 @@ import { useTheme } from "./useTheme";
 // the top feel alive.
 
 export function HeroPanel() {
-  const { dark, toggle } = useTheme();
+  const { dark } = useTheme();
   const ref = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(false);
   const [openGen, setOpenGen] = useState(0);
@@ -41,7 +41,6 @@ export function HeroPanel() {
       <Panel
         dash={DEMO_DASHBOARD}
         dark={dark}
-        onToggleTheme={toggle}
         openGen={openGen}
         active={active}
         compact
