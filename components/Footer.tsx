@@ -58,8 +58,15 @@ export function Footer({ locale }: { locale: Locale }) {
       className="border-t border-border bg-bg pt-14"
     >
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="grid grid-cols-1 gap-9 md:grid-cols-[2fr_1fr_1fr_1fr]">
-          <div>
+        {/* Mobile (default): 2-column grid. The brand block takes the full
+            top row (col-span-2), then the three link columns flow into the
+            remaining cells — Product + Resources share row 2, Install lands
+            alone on row 3 (the cell beside it stays empty, which actually
+            reads as visual breathing room rather than a gap).
+            md+ keeps the original asymmetric 4-column layout where the brand
+            block sits flush-left alongside the link columns. */}
+        <div className="grid grid-cols-2 gap-8 sm:gap-9 md:grid-cols-[2fr_1fr_1fr_1fr]">
+          <div className="col-span-2 md:col-span-1">
             <AnchorLink
               href="#top"
               className="inline-flex items-center gap-2.5 font-sans text-base font-semibold tracking-tight"
