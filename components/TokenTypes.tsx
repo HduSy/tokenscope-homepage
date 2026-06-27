@@ -1,29 +1,43 @@
 import { Reveal } from "./Reveal";
+import { CostLedger } from "./CostLedger";
+import { fmtInt } from "@/lib/tokenscope-data";
 
-// Four-rung ladder explaining how each token type is priced. The colour key:
-// t1 accent, t2 accent-soft, t3 accent faded, t4 delta-up (red-ish).
+// The cost engine, made literal. Tokenscope's pricing is one Rust function
+// (app src-tauri/src/pricing.rs::cost): for every JSONL request it reads four
+// token counts out of the `usage` object, looks up the model's per-million
+// rates, multiplies each count by its own rate, and sums the four. This
+// section walks that exact pipeline on one coding session, instead of only
+// listing the rate ratios.
+//
+// The rates below are the real published Anthropic per-million prices for
+// claude-sonnet-4-6 ($3 / $15 / $3.75 / $0.30), which is also the built-in
+// backstop in pricing.rs. The token counts are an illustrative coding session.
 
-const rungs: { mul: string; name: string; why: string; colorClass: string }[] = [
-  { mul: "1×", name: "Input", why: "New prompt tokens sent this turn.", colorClass: "text-accent" },
+type Row = { type: string; key: string; count: number; rate: number; cls: string };
+
+const MODEL = "claude-sonnet-4-6";
+
+const ROWS: Row[] = [
+  { type: "Input", key: "input_tokens", count: 88000, rate: 3.0, cls: "text-accent" },
   {
-    mul: "1.25×",
-    name: "Cache write",
-    why: "Context written into the prompt cache.",
-    colorClass: "text-accent-soft",
+    type: "Cache write",
+    key: "cache_creation_input_tokens",
+    count: 1120000,
+    rate: 3.75,
+    cls: "text-accent-soft",
   },
   {
-    mul: "0.1×",
-    name: "Cache read",
-    why: "Context replayed from cache. The cheap one.",
-    colorClass: "text-accent opacity-55",
+    type: "Cache read",
+    key: "cache_read_input_tokens",
+    count: 2400000,
+    rate: 0.3,
+    cls: "text-accent opacity-60",
   },
-  {
-    mul: "5×",
-    name: "Output",
-    why: "Tokens the model generates. The priciest.",
-    colorClass: "text-delta-up",
-  },
+  { type: "Output", key: "output_tokens", count: 320000, rate: 15.0, cls: "text-delta-up" },
 ];
+
+const KEY_W = Math.max(...ROWS.map((r) => r.key.length));
+const TOTAL = ROWS.reduce((s, r) => s + (r.count * r.rate) / 1e6, 0);
 
 export function TokenTypes() {
   return (
@@ -31,40 +45,58 @@ export function TokenTypes() {
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>
-            Why a cache hit barely costs anything.
+            How a request turns into dollars.
           </h2>
           <p className="mt-3.5 text-[17px] leading-[1.55] text-dim">
-            Every token is billed by type. The four counts are mutually exclusive, and cached
-            reads run roughly one hundred times cheaper than fresh output.
+            Each JSONL request logs four token counts. Tokenscope rolls them up per session,
+            multiplies each by the model&rsquo;s rate for that type, and sums the four. That is the
+            whole engine.
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-4">
-          {rungs.map((r, i) => (
-            <Reveal
-              key={r.name}
-              as="div"
-              // 3× the default stagger: each rung waits ~210ms after the
-              // previous (vs the page-wide 70ms cadence) so the four cards
-              // visibly cascade in instead of looking near-simultaneous.
-              delayIndex={i * 3}
-              className="rounded-[var(--radius-lg)] border border-border bg-card p-6"
-            >
-              <div
-                className={`font-mono text-[44px] leading-none font-semibold tracking-[-0.02em] ${r.colorClass}`}
-              >
-                {r.mul}
-              </div>
-              <div className="mt-3.5 font-sans text-[15px] font-semibold">{r.name}</div>
-              <div className="mt-1 text-[13.5px] leading-[1.5] text-dim">{r.why}</div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal
+          as="div"
+          delayIndex={1}
+          className="grid grid-cols-1 gap-7 rounded-[var(--radius-lg)] border border-border bg-card p-6 sm:p-8 lg:grid-cols-2 lg:gap-10"
+        >
+          {/* The session: the four token totals, same fields the JSONL logs. */}
+          <div className="min-w-0">
+            <pre className="overflow-x-auto rounded-[var(--radius-md)] border border-border bg-card-2 p-4 font-mono text-[12.5px] leading-[1.9] text-text">
+              <span className="text-faint">{"// " + MODEL + " · one coding session"}</span>
+              {"\n"}
+              <span className="text-dim">{"tokens: {"}</span>
+              {"\n"}
+              {ROWS.map((r) => (
+                <span key={r.key}>
+                  {"  "}
+                  <span className="text-dim">{r.key.padEnd(KEY_W)}</span>
+                  {": "}
+                  <span className={r.cls}>{fmtInt(r.count)}</span>
+                  {"\n"}
+                </span>
+              ))}
+              <span className="text-dim">{"}"}</span>
+            </pre>
+          </div>
 
-        <Reveal as="p" className="mt-7 max-w-[70ch] text-[14px] leading-[1.6] text-dim">
-          So a day with ninety-nine percent cache reads can log millions of tokens yet cost a few
-          dollars. The panel folds cache into &ldquo;In&rdquo; for display only; billing always
-          uses the four rates above.
+          {/* The cost: each count × its per-million rate, summed. Animated in
+              by <CostLedger/> — rows light up in sequence, then the total
+              counts from 0. */}
+          <CostLedger rows={ROWS} total={TOTAL} />
+        </Reveal>
+
+        <Reveal as="p" delayIndex={2} className="mt-6 max-w-[68ch] text-[14px] leading-[1.6] text-dim">
+          Rates resolve from models.dev first, LiteLLM as a fallback, then a built-in snapshot when
+          you&rsquo;re offline, and cache on disk for 24 hours. The panel folds cache into
+          &ldquo;In&rdquo; for display only; billing always uses the four rates above.
+        </Reveal>
+
+        <Reveal as="p" delayIndex={3} className="mt-3 max-w-[68ch] text-[15px] leading-[1.55] text-text">
+          Notice that <span className="font-medium text-accent opacity-80">2,400,000 cache-read
+          tokens</span> cost just $0.72. The same session&rsquo;s{" "}
+          <span className="font-medium text-delta-up">320,000 output tokens</span> cost $4.80, over
+          six times more on far fewer tokens. Token count alone never decides the bill; the rate per
+          type does.
         </Reveal>
       </div>
     </section>
