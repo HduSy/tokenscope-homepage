@@ -7,7 +7,7 @@
 // expand/collapse), so the bilingual site can swap "No tokens" / "tokens" /
 // "Less" / "More" / "more" / "show less" / month abbreviations per locale.
 
-import { useEffect, useId, useState, type CSSProperties } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { useInView } from "../useInView";
 import {
   Theme,
@@ -47,23 +47,22 @@ const EN_FALLBACK: Pick<
   barListLess: "show less",
 };
 
-// On touch devices, a tap fires synthetic mouseenter but lift / slide-off
-// often skips mouseleave entirely, so the tooltip gets stuck after the
-// finger is gone. While a tooltip is showing, listen on the document for
-// touchend / touchcancel and clear the hover state — that fires reliably
-// when the finger leaves the screen no matter where the tap started.
-// Passive listeners (we never preventDefault) so they don't interfere
-// with native touch scrolling on the chart container.
-function useTouchDismiss(active: boolean, clear: () => void) {
-  useEffect(() => {
-    if (!active) return;
-    document.addEventListener("touchend", clear, { passive: true });
-    document.addEventListener("touchcancel", clear, { passive: true });
-    return () => {
-      document.removeEventListener("touchend", clear);
-      document.removeEventListener("touchcancel", clear);
-    };
-  }, [active, clear]);
+// On touch devices the bar/cell hover handlers can't rely on synthetic mouse
+// events: iOS Safari fires `mouseenter` AFTER `touchend`, so any cleanup we
+// attached when the tooltip first appeared already missed its chance to fire.
+// The fix is to use Pointer Events (which unify mouse + touch) and release
+// the implicit pointer capture on `pointerdown`. Without that release, the
+// touch is "captured" by the bar where it started — sliding to a neighbour
+// won't fire pointerleave on the original until the finger lifts. After
+// release, pointerenter / pointerleave behave like their mouse counterparts
+// for touch too: leave fires when the finger slides off the element OR lifts.
+function releaseCapture(e: React.PointerEvent) {
+  try {
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+  } catch {
+    // Some browsers throw if the pointer isn't currently captured; that's
+    // fine — we only need to make sure capture isn't held.
+  }
 }
 
 // Compact label component used by Panel sections. Exported so Breakdowns can
@@ -156,11 +155,10 @@ export function BarChart({ data, theme, height = 96, accent, accentSoft, radius 
   const effRadius = n > 16 ? 1 : radius;
   const [hi, setHi] = useState<SeriesPoint | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
-  useTouchDismiss(hi !== null, () => setHi(null));
   // position:fixed so the tooltip renders above the scrolling card (not clipped).
   // Anchor to the *visible bar top* (baseline − bar height), not the full-height
   // column top, so short bars don't push the tooltip up over the legend above.
-  const onBar = (d: SeriesPoint, e: React.MouseEvent) => {
+  const onBar = (d: SeriesPoint, e: React.PointerEvent) => {
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const barPx = ((d.input + d.cache + d.output) / max) * height;
     setHi(d); setTip({ x: r.left + r.width / 2, y: r.bottom - barPx });
@@ -178,8 +176,10 @@ export function BarChart({ data, theme, height = 96, accent, accentSoft, radius 
           const on = hi === d;
           return (
             <div key={i}
-              onMouseEnter={empty ? undefined : (e) => onBar(d, e)}
-              onMouseLeave={empty ? undefined : () => setHi(null)}
+              onPointerDown={empty ? undefined : releaseCapture}
+              onPointerEnter={empty ? undefined : (e) => onBar(d, e)}
+              onPointerLeave={empty ? undefined : () => setHi(null)}
+              onPointerCancel={empty ? undefined : () => setHi(null)}
               style={{ flex: 1, alignSelf: "stretch", display: "flex", flexDirection: "column", justifyContent: "flex-end", position: "relative", zIndex: 1, cursor: "default", opacity: hi && !on && !empty ? 0.55 : 1, transition: "opacity .12s" }}>
               <div style={{ height: hO, background: accentSoft, borderRadius: `${effRadius}px ${effRadius}px 0 0` }} />
               <div style={{ height: hI, background: accent }} />
@@ -242,7 +242,6 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
   { models: ModelStat[]; theme: Theme; size?: number; thickness?: number }) {
   const t = theme;
   const [hi, setHi] = useState(-1);
-  useTouchDismiss(hi >= 0, () => setHi(-1));
   // Rank by cost (desc) and recolor by that rank — usage from most to least.
   const ranked = [...models]
     .sort((a, b) => b.cost - a.cost)
@@ -278,7 +277,12 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
       <div style={{ position: "relative", width: size, height: size, flex: "0 0 auto" }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ overflow: "visible" }}>
           {models.length === 1 ? (
-            <g onMouseEnter={() => setHi(0)} onMouseLeave={() => setHi(-1)} style={{ cursor: "default" }}>
+            <g
+              onPointerDown={releaseCapture}
+              onPointerEnter={() => setHi(0)}
+              onPointerLeave={() => setHi(-1)}
+              onPointerCancel={() => setHi(-1)}
+              style={{ cursor: "default" }}>
               <circle cx={cx} cy={cy} r={(rOut + rIn) / 2}
                 fill="none" stroke={models[0].color} strokeWidth={thickness} />
               <circle cx={cx} cy={cy} r={rOut} fill="none" stroke={t.card} strokeWidth={1} />
@@ -288,7 +292,10 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
             wedges.map((w) => (
               <path key={w.i} d={w.d} fill={w.m.color}
                 opacity={hi === -1 || hi === w.i ? 1 : 0.32}
-                onMouseEnter={() => setHi(w.i)} onMouseLeave={() => setHi(-1)}
+                onPointerDown={releaseCapture}
+                onPointerEnter={() => setHi(w.i)}
+                onPointerLeave={() => setHi(-1)}
+                onPointerCancel={() => setHi(-1)}
                 style={{ transition: "opacity .14s", cursor: "default" }} />
             ))
           )}
@@ -299,7 +306,11 @@ export function CostDonut({ models, theme, size = 104, thickness = 16 }:
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         {models.map((m, i) => (
-          <div key={i} onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(-1)}
+          <div key={i}
+            onPointerDown={releaseCapture}
+            onPointerEnter={() => setHi(i)}
+            onPointerLeave={() => setHi(-1)}
+            onPointerCancel={() => setHi(-1)}
             style={{ display: "flex", alignItems: "center", gap: 7, padding: "2.5px 0", opacity: hi === -1 || hi === i ? 1 : 0.45, transition: "opacity .14s", cursor: "default", userSelect: "none" }}>
             <span style={{ width: 7, height: 7, borderRadius: 2, background: m.color, flex: "0 0 auto" }} />
             <span style={{ font: `500 10.5px ${t.ui}`, color: t.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, fontWeight: hi === i ? 600 : 500 }}>{m.name.replace("Claude ", "")}</span>
@@ -379,7 +390,6 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false, labels,
   const L = labels || EN_FALLBACK;
   const [hi, setHi] = useState<HeatDay | null>(null);
   const [tip, setTip] = useState({ x: 0, y: 0 });
-  useTouchDismiss(hi !== null, () => setHi(null));
   // `animate` is opt-in: stagger cells in left-to-right once in view. Reuses
   // the wrapper as the observer target. Snaps to visible under reduced-motion.
   const { ref: wrapRef, inView } = useInView<HTMLDivElement>();
@@ -410,7 +420,7 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false, labels,
     }
   });
   const MN = months || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const onCell = (d: HeatDay, e: React.MouseEvent) => {
+  const onCell = (d: HeatDay, e: React.PointerEvent) => {
     const r = (e.target as HTMLElement).getBoundingClientRect();
     setHi(d); setTip({ x: r.left + r.width / 2, y: r.top });
   };
@@ -426,8 +436,10 @@ export function Heatmap({ days, theme, accent, gap = 2, animate = false, labels,
           <div key={wi} style={{ display: "flex", flexDirection: "column", gap, flex: "1 1 0", minWidth: 0 }}>
             {wk.map((d, di) => (
               <div key={di}
-                onMouseEnter={d ? (e) => onCell(d, e) : undefined}
-                onMouseLeave={() => setHi(null)}
+                onPointerDown={d ? releaseCapture : undefined}
+                onPointerEnter={d ? (e) => onCell(d, e) : undefined}
+                onPointerLeave={() => setHi(null)}
+                onPointerCancel={() => setHi(null)}
                 className={animate ? `heat-anim${inView ? " in" : ""}` : undefined}
                 style={{
                   width: "100%", aspectRatio: "1 / 1", borderRadius: 2,
