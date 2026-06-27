@@ -63,6 +63,7 @@ export const en = {
     langSwitchLabel: "Switch language",
     en: "EN",
     zh: "中",
+    skipToContent: "Skip to content",
   },
 
   // ── Hero (top of page) ─

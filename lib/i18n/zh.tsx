@@ -50,6 +50,7 @@ export const zh: Dict = {
     langSwitchLabel: "切换语言",
     en: "EN",
     zh: "中",
+    skipToContent: "跳到主要内容",
   },
 
   hero: {
