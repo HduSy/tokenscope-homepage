@@ -54,6 +54,17 @@ export const zh: Dict = {
     copyLink: "复制链接",
     linkCopied: "链接已复制",
     linkCopyFailed: "复制失败，请手动复制 URL",
+    qrModalClose: "关闭",
+    qrScanWith: (platform: string) => `使用「${platform}」扫一扫`,
+    qrInstruction: "在 App 中打开后即可分享。",
+    sharePlatforms: {
+      wechat: "微信",
+      wechatMoments: "朋友圈",
+      xiaohongshu: "小红书",
+      weibo: "微博",
+      qq: "QQ",
+      qzone: "QQ空间",
+    },
   },
 
   hero: {

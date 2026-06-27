@@ -67,6 +67,19 @@ export const en = {
     copyLink: "Copy link",
     linkCopied: "Link copied",
     linkCopyFailed: "Copy failed — select the URL manually",
+    // ── Chinese-only sharing copy (still referenced by the shared component so
+    // the Dict type stays a single shape; English visitors never see these). ─
+    qrModalClose: "Close",
+    qrScanWith: (platform: string) => `Scan with ${platform}`,
+    qrInstruction: "Open the app and share from there.",
+    sharePlatforms: {
+      wechat: "WeChat",
+      wechatMoments: "WeChat Moments",
+      xiaohongshu: "Xiaohongshu",
+      weibo: "Weibo",
+      qq: "QQ",
+      qzone: "Qzone",
+    },
   },
 
   // ── Hero (top of page) ─
