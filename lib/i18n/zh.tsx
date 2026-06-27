@@ -22,7 +22,7 @@ export const zh: Dict = {
     description:
       "一个 macOS 菜单栏小工具，实时显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
     ogDescription:
-      "看清你的 Claude Code 到底花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的菜单栏。",
+      "看清你的 Claude Code 消耗了多少 Token、花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的菜单栏。",
     ogAlt: "Tokenscope — Claude Code Token 费用，全在你的 macOS 菜单栏",
   },
 
@@ -56,7 +56,7 @@ export const zh: Dict = {
   hero: {
     pill: "Claude Code 的 macOS 菜单栏小工具",
     h1Lead: "看清你的 Claude Code",
-    h1Accent: "到底花了多少钱",
+    h1Accent: "消耗了多少 Token，花了多少钱",
     sub: "一个常驻菜单栏的小工具，显示每日 Token 费用、按模型拆分、MCP 与 Skill 调用次数。只读，不会打扰你。",
   },
 
