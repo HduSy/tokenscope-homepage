@@ -206,7 +206,17 @@ export function ShareMenu({ locale }: { locale: Locale }) {
       {open && (
         <div
           role="menu"
-          className="absolute top-11 z-50 w-44 right-0 min-[1440px]:left-0 min-[1440px]:right-auto overflow-hidden rounded-[var(--radius-md)] border border-border bg-card p-1.5 shadow-[var(--shadow-card)]"
+          // Anchor strategy:
+          //   • Mobile (< sm): horizontally centered on the share button —
+          //     ZH mobile shows only the Copy-link row, and a centered tiny
+          //     popover under the button reads more like a tooltip than the
+          //     edge-anchored desktop dropdown.
+          //   • sm – 1440px: anchored right (`right-0`), opens leftward.
+          //     Always fits because the share button sits in the nav's
+          //     right cluster.
+          //   • ≥1440px: there's room to the right of the button, so flip
+          //     to left-anchored (`left-0`) and open rightward.
+          className="absolute top-11 z-50 w-44 left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 min-[1440px]:left-0 min-[1440px]:right-auto overflow-hidden rounded-[var(--radius-md)] border border-border bg-card p-1.5 shadow-[var(--shadow-card)]"
         >
           {/* Copy link — always present, first row. */}
           <button
