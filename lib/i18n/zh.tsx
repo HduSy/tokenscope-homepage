@@ -150,7 +150,7 @@ export const zh: Dict = {
       footnote:
         "Claude Code 会把长上下文写入提示缓存（cache write），下次同样的请求直接从缓存重放（cache read）。" +
         "缓存写入比普通输入贵约 25%，缓存命中的单价却只有普通输入的约 10%。" +
-        "一段持续会话里，系统提示、项目文件、工具描述会被反复作为上下文携带，命中率越高账单越省。",
+        "一段持续会话里，系统提示、项目文件、工具描述会被反复作为上下文携带，命中率越高越省钱。",
     },
     requests: "请求数",
     sessionsSuffix: "次会话",
@@ -221,7 +221,7 @@ export const zh: Dict = {
 
   faq: {
     h2: "常见问题。",
-    intro: "人们在选择 Tokenscope 之前通常会问到的问题。",
+    intro: "大家在选择 Tokenscope 之前通常会问到的问题。",
     items: [
       {
         q: "Tokenscope 会不会把我的数据发送到网络上？",
