@@ -25,7 +25,7 @@ const REVIEWS: Review[] = [
   {
     ...AUTHOR,
     quote:
-      "Genuinely fun to use - every time your usage ticks past another 100M tokens, Tokenscope sets off this little fireworks animation. Weirdly satisfying, and it actually makes you feel like you've accomplished something.",
+      "Genuinely fun to use - every time your usage ticks past another 100M tokens, Tokenscope sets off this little fireworks animation 🎉. Weirdly satisfying, and it actually makes you feel like you've accomplished something.",
   },
   {
     ...AUTHOR,
