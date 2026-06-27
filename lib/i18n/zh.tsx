@@ -57,6 +57,7 @@ export const zh: Dict = {
     qrModalClose: "关闭",
     qrScanWith: (platform: string) => `使用「${platform}」扫一扫`,
     qrInstruction: "在 App 中打开后即可分享。",
+    linkCopiedPasteIn: (platform: string) => `链接已复制，请在「${platform}」中粘贴分享`,
     sharePlatforms: {
       wechat: "微信",
       wechatMoments: "朋友圈",

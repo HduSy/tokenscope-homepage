@@ -83,25 +83,39 @@ type ZhPlatform = {
   // tinted).
   tint: string;
   // kind === "url" → plain external link, just like the English rows.
-  // kind === "qr"  → no share intent, opens QR modal (desktop) or triggers
-  //                  navigator.share (mobile, if available).
+  // kind === "qr"  → no public share intent (the platform doesn't expose one
+  //                  outside its own webview / signed JSSDK). On desktop we
+  //                  show a QR modal; on mobile we copy the URL to the
+  //                  clipboard and try to open the app via URL scheme so the
+  //                  user can paste into a chat / post.
 } & (
   | { kind: "url"; href: (url: string, title: string) => string }
-  | { kind: "qr" }
+  // `scheme` is the iOS-style URL scheme used to open the app from a mobile
+  // browser. Most Chinese apps register the same scheme on Android, so a
+  // single value covers both platforms — Chrome Android, WeChat browser,
+  // Safari iOS all handle e.g. `weixin://` by prompting "Open in WeChat?".
+  // No public share-target deep link exists for these apps (they reserve
+  // that for OpenSDK partners), so we open the app at its home and rely on
+  // the clipboard for the actual content.
+  | { kind: "qr"; scheme: string }
 );
 
 const ZH_PLATFORMS: ZhPlatform[] = [
-  { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr" },
+  { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr", scheme: "weixin://" },
   // 朋友圈's app-icon mark is a sunburst — Phosphor's `sun` is a close
   // enough silhouette that it reads as Moments at the menu's 17px size,
-  // tinted Moments orange.
-  { key: "wechatMoments", icon: "sun", tint: "#FF9A1F", kind: "qr" },
-  { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr" },
+  // tinted Moments orange. Scheme is `weixin://` (same app); the user
+  // navigates to Moments inside WeChat themselves.
+  { key: "wechatMoments", icon: "sun", tint: "#FF9A1F", kind: "qr", scheme: "weixin://" },
+  { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr", scheme: "xhsdiscover://" },
   {
     key: "weibo",
     icon: "weibo-logo",
     tint: "#E6162D",
     kind: "url",
+    // service.weibo.com IS a Weibo Universal Link — iOS routes installed-Weibo
+    // users into the app, everyone else gets the web share form. Same URL
+    // for PC + mobile.
     href: (u, t) =>
       `https://service.weibo.com/share/share.php?url=${enc(u)}&title=${enc(t)}`,
   },
@@ -110,6 +124,9 @@ const ZH_PLATFORMS: ZhPlatform[] = [
     icon: "qq-logo",
     tint: "#12B7F5",
     kind: "url",
+    // Tencent's connect.qq.com is the official cross-platform share endpoint;
+    // iOS/Android with QQ installed get the universal-link redirect into the
+    // app, others see the web form.
     href: (u, t) =>
       `https://connect.qq.com/widget/shareqq/index.html?url=${enc(u)}&title=${enc(t)}&desc=${enc(t)}`,
   },
@@ -123,14 +140,12 @@ const ZH_PLATFORMS: ZhPlatform[] = [
   },
 ];
 
-// Whether to prefer the system share sheet for QR-only platforms. We only
-// route through it when both (a) navigator.share is available and (b) the
-// device looks like a phone — desktop Safari/Edge also expose navigator.share
-// but their share sheet won't list WeChat / Moments / Xiaohongshu, so the
-// QR modal is the better path there.
-function shouldUseWebShare(): boolean {
+// Phone-shaped device check — used to split the QR-only platforms (WeChat /
+// Moments / Xiaohongshu) between desktop (QR modal) and mobile (copy +
+// scheme). Pure UA-test; we never need to know the exact OS, just whether
+// hand-off-to-app is plausible.
+function isMobileDevice(): boolean {
   if (typeof navigator === "undefined") return false;
-  if (typeof navigator.share !== "function") return false;
   return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
@@ -171,17 +186,32 @@ export function ShareMenu({ locale }: { locale: Locale }) {
 
   const onZhQrPlatform = async (key: ZhPlatformKey) => {
     setOpen(false);
-    // Prefer the system share sheet on devices that have one — on Chinese
-    // mobiles it surfaces WeChat / Moments / Xiaohongshu natively.
-    if (shouldUseWebShare()) {
+    const platform = ZH_PLATFORMS.find((p) => p.key === key);
+    if (!platform || platform.kind !== "qr") return;
+
+    if (isMobileDevice()) {
+      // Mobile path — copy URL to clipboard, then hand off to the app via
+      // its URL scheme. The user pastes the URL into a chat / post once
+      // inside the app. Toast survives the navigation because <Toast/> is
+      // rendered into a portal at document.body that stays attached when
+      // the app-switching URL kicks in.
       try {
-        await navigator.share({ title: dict.site.tagline, url });
-        return;
+        await navigator.clipboard?.writeText(url);
       } catch {
-        // User dismissed the sheet, or the platform refused — fall through
-        // to the QR modal so they still have a path.
+        // Clipboard denied (older Android, secure-context issues). The
+        // toast still tells the user what to expect; they can long-press
+        // to copy from the address bar themselves.
       }
+      showToast(dict.nav.linkCopiedPasteIn(dict.nav.sharePlatforms[key]));
+      // window.location triggers the scheme. iOS/modern Android intercept
+      // it and prompt "Open in WeChat / Xiaohongshu?". If the app isn't
+      // installed, the browser silently no-ops (or shows a generic error
+      // on iOS) — the clipboard + toast still give the user a path.
+      window.location.href = platform.scheme;
+      return;
     }
+
+    // Desktop: QR modal so the user can scan with their phone.
     setQrFor(key);
   };
 

@@ -72,6 +72,7 @@ export const en = {
     qrModalClose: "Close",
     qrScanWith: (platform: string) => `Scan with ${platform}`,
     qrInstruction: "Open the app and share from there.",
+    linkCopiedPasteIn: (platform: string) => `Link copied — paste it in ${platform} to share.`,
     sharePlatforms: {
       wechat: "WeChat",
       wechatMoments: "WeChat Moments",
