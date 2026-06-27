@@ -102,11 +102,10 @@ type ZhPlatform = {
 
 const ZH_PLATFORMS: ZhPlatform[] = [
   { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr", scheme: "weixin://" },
-  // 朋友圈's app-icon mark is a sunburst — Phosphor's `sun` is a close
-  // enough silhouette that it reads as Moments at the menu's 17px size,
-  // tinted Moments orange. Scheme is `weixin://` (same app); the user
-  // navigates to Moments inside WeChat themselves.
-  { key: "wechatMoments", icon: "sun", tint: "#FF9A1F", kind: "qr", scheme: "weixin://" },
+  // 朋友圈's app-icon mark is a multi-petal sunburst. Phosphor's `flower`
+  // (an 8-petal daisy) reads as Moments at menu size — closer than `sun`
+  // (rays of light), which the earlier pass used. Tinted Moments orange.
+  { key: "wechatMoments", icon: "flower", tint: "#FF9A1F", kind: "qr", scheme: "weixin://" },
   { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr", scheme: "xhsdiscover://" },
   {
     key: "weibo",
