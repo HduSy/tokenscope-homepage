@@ -97,6 +97,13 @@
 
 html {
   scroll-behavior: smooth;
+  /* Offset anchor jumps by the sticky nav's height (h-16 = 64px) plus a little
+     breathing room, so clicking a header/footer nav link lands the section's
+     title *below* the nav instead of tucked underneath it. Applies to native
+     hash navigation (the path these links take — Lenis runs with anchors off)
+     in both smooth and reduced-motion modes. Doesn't affect wheel/touch scroll
+     or the lenis.scrollTo(0) back-to-top (which clamps to 0 regardless). */
+  scroll-padding-top: 5rem;
 }
 
 body {

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AnchorLink } from "./AnchorLink";
 import { Icon } from "./Icon";
 import { LogoLink } from "./LogoLink";
 import { ShareMenu } from "./ShareMenu";
@@ -30,13 +30,13 @@ export function Nav() {
 
         <div className="hidden items-center gap-6 md:flex">
           {links.map((l) => (
-            <Link
+            <AnchorLink
               key={l.href}
               href={l.href}
               className="text-[14px] font-medium text-dim transition-colors hover:text-text"
             >
               {l.label}
-            </Link>
+            </AnchorLink>
           ))}
         </div>
 

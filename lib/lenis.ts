@@ -37,3 +37,25 @@ export function scrollToTop(smooth = true) {
   // the native API.
   window.scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" });
 }
+
+// Same-page hash anchors (the header + footer section links). Routed through
+// Lenis for the same reason scrollToTop is: a native hash jump races Lenis's
+// rAF scroll loop and can be cancelled on the next frame, so the click lands
+// late, short, or not at all. `offset` clears the sticky nav — it mirrors the
+// scroll-padding-top (5rem) in globals.css so the section's title lands below
+// the nav, matching the native / no-JS path exactly.
+const NAV_OFFSET = -80;
+
+export function scrollToHash(hash: string, smooth = true) {
+  if (typeof window === "undefined") return;
+  const id = hash.startsWith("#") ? hash.slice(1) : hash;
+  const el = id ? document.getElementById(id) : null;
+  if (!el) return;
+  if (instance) {
+    instance.scrollTo(el, { offset: NAV_OFFSET, immediate: !smooth });
+    return;
+  }
+  // No Lenis (reduced-motion / pre-hydration) → native, which already honors
+  // scroll-padding-top for the offset.
+  el.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+}

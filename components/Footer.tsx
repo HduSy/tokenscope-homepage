@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AnchorLink } from "./AnchorLink";
 import { BrandMark } from "./BrandMark";
 
 type Col = { title: string; links: { href: string; label: string; external?: boolean }[] };
@@ -55,13 +55,13 @@ export function Footer() {
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="grid grid-cols-1 gap-9 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div>
-            <Link
+            <AnchorLink
               href="#top"
               className="inline-flex items-center gap-2.5 font-sans text-base font-semibold tracking-tight"
             >
               <BrandMark size={20} />
               Tokenscope
-            </Link>
+            </AnchorLink>
             <p className="mt-2.5 max-w-[26ch] text-[13.5px] text-dim">
               Token usage for your Claude CLI, in the macOS menu bar.
             </p>
@@ -83,13 +83,13 @@ export function Footer() {
                     {l.label}
                   </a>
                 ) : (
-                  <Link
+                  <AnchorLink
                     key={l.href + l.label}
                     href={l.href}
                     className="block py-1 text-sm text-dim transition-colors hover:text-text"
                   >
                     {l.label}
-                  </Link>
+                  </AnchorLink>
                 ),
               )}
             </div>
