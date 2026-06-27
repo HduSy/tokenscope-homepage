@@ -92,10 +92,10 @@ type ZhPlatform = {
 
 const ZH_PLATFORMS: ZhPlatform[] = [
   { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr" },
-  // 朋友圈 shares WeChat's glyph (it's the same app) but uses Moments' sunshine
-  // orange to distinguish at a glance. Real-world Chinese share menus do the
-  // same — disambiguation is via label + color, not a unique icon.
-  { key: "wechatMoments", icon: "wechat-logo", tint: "#FF9A1F", kind: "qr" },
+  // 朋友圈's app-icon mark is a sunburst — Phosphor's `sun` is a close
+  // enough silhouette that it reads as Moments at the menu's 17px size,
+  // tinted Moments orange.
+  { key: "wechatMoments", icon: "sun", tint: "#FF9A1F", kind: "qr" },
   { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr" },
   {
     key: "weibo",
@@ -113,13 +113,10 @@ const ZH_PLATFORMS: ZhPlatform[] = [
     href: (u, t) =>
       `https://connect.qq.com/widget/shareqq/index.html?url=${enc(u)}&title=${enc(t)}&desc=${enc(t)}`,
   },
-  // QQ空间 reuses the QQ glyph in Qzone's signature yellow. Tencent's two
-  // products share visual lineage; the label + tint is enough to tell them
-  // apart in a 6-row menu.
   {
     key: "qzone",
-    icon: "qq-logo",
-    tint: "#FFC60A",
+    icon: "qzone-logo",
+    tint: "#FECE00",
     kind: "url",
     href: (u, t) =>
       `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${enc(u)}&title=${enc(t)}&desc=${enc(t)}`,
