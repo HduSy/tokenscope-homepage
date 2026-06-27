@@ -1,50 +1,52 @@
 import { AnchorLink } from "./AnchorLink";
 import { BrandMark } from "./BrandMark";
 import { getDict, type Locale } from "@/lib/i18n";
+import type { Dict } from "@/lib/i18n";
 
-type Col = { title: string; links: { href: string; label: string; external?: boolean }[] };
+// Footer column structure is locale-invariant — the column titles + link
+// labels come from the dict, but href + external + which dict key map are
+// static. Hoisting per `rendering-hoist-jsx`: array literal in the function
+// body would be rebuilt on every render.
+type LinkKey = keyof Dict["footer"]["links"];
+type Col = {
+  titleKey: keyof Dict["footer"]["columns"];
+  links: { href: string; labelKey: LinkKey; external?: boolean }[];
+};
+
+const COLS: Col[] = [
+  {
+    titleKey: "product",
+    links: [
+      { href: "#breakdowns", labelKey: "breakdowns" },
+      { href: "#how", labelKey: "how" },
+      { href: "#pricing", labelKey: "pricing" },
+      { href: "#faq", labelKey: "faq" },
+    ],
+  },
+  {
+    titleKey: "resources",
+    links: [
+      { href: "https://github.com/HduSy/tokenscope", labelKey: "github", external: true },
+      { href: "https://github.com/HduSy/tokenscope/releases", labelKey: "releases", external: true },
+      { href: "https://models.dev", labelKey: "modelsDev", external: true },
+      {
+        href: "https://github.com/HduSy/tokenscope/blob/main/docs/BUGFIXES.md",
+        labelKey: "bugLog",
+        external: true,
+      },
+    ],
+  },
+  {
+    titleKey: "install",
+    links: [
+      { href: "#install", labelKey: "homebrew" },
+      { href: "https://github.com/HduSy/tokenscope/releases", labelKey: "dmg", external: true },
+    ],
+  },
+];
 
 export function Footer({ locale }: { locale: Locale }) {
   const t = getDict(locale);
-  const cols: Col[] = [
-    {
-      title: t.footer.columns.product,
-      links: [
-        { href: "#breakdowns", label: t.footer.links.breakdowns },
-        { href: "#how", label: t.footer.links.how },
-        { href: "#pricing", label: t.footer.links.pricing },
-        { href: "#faq", label: t.footer.links.faq },
-      ],
-    },
-    {
-      title: t.footer.columns.resources,
-      links: [
-        { href: "https://github.com/HduSy/tokenscope", label: t.footer.links.github, external: true },
-        {
-          href: "https://github.com/HduSy/tokenscope/releases",
-          label: t.footer.links.releases,
-          external: true,
-        },
-        { href: "https://models.dev", label: t.footer.links.modelsDev, external: true },
-        {
-          href: "https://github.com/HduSy/tokenscope/blob/main/docs/BUGFIXES.md",
-          label: t.footer.links.bugLog,
-          external: true,
-        },
-      ],
-    },
-    {
-      title: t.footer.columns.install,
-      links: [
-        { href: "#install", label: t.footer.links.homebrew },
-        {
-          href: "https://github.com/HduSy/tokenscope/releases",
-          label: t.footer.links.dmg,
-          external: true,
-        },
-      ],
-    },
-  ];
 
   return (
     <footer
@@ -69,32 +71,33 @@ export function Footer({ locale }: { locale: Locale }) {
               {t.footer.caption}
             </p>
           </div>
-          {cols.map((col) => (
-            <div key={col.title}>
+          {COLS.map((col) => (
+            <div key={col.titleKey}>
               <h4 className="mb-3 font-sans text-xs font-semibold tracking-[0.06em] text-faint uppercase">
-                {col.title}
+                {t.footer.columns[col.titleKey]}
               </h4>
-              {col.links.map((l) =>
-                l.external ? (
+              {col.links.map((l) => {
+                const label = t.footer.links[l.labelKey];
+                return l.external ? (
                   <a
-                    key={l.href + l.label}
+                    key={l.href + l.labelKey}
                     href={l.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block py-1 text-sm text-dim transition-colors hover:text-text"
                   >
-                    {l.label}
+                    {label}
                   </a>
                 ) : (
                   <AnchorLink
-                    key={l.href + l.label}
+                    key={l.href + l.labelKey}
                     href={l.href}
                     className="block py-1 text-sm text-dim transition-colors hover:text-text"
                   >
-                    {l.label}
+                    {label}
                   </AnchorLink>
-                ),
-              )}
+                );
+              })}
             </div>
           ))}
         </div>

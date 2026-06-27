@@ -8,7 +8,7 @@ import { getDict, type Locale } from "@/lib/i18n";
 export function FinalCta({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   return (
-    <section className="pb-16 sm:pb-24">
+    <section className="cv-auto pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal
           as="div"

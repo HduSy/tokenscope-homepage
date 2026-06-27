@@ -18,8 +18,11 @@ type Review = { name: string; role?: string; avatar?: string; quote: string };
 // The author identity (name, handle, avatar URL) stays locale-invariant;
 // the role label and the quote text come from the dict.
 const AUTHOR_NAME = "alifeiliu";
-const AUTHOR_AVATAR =
-  "https://pbs.twimg.com/profile_images/1818868279135313920/R_t7Z5mr_400x400.jpg";
+// Avatar served from /public — was originally pbs.twimg.com 400×400 (~24KB),
+// now /avatars/alifeiliu.jpg 88×88 jpg (~5KB, perfect for 2× retina at 44px
+// display). Local serving also drops the cross-origin DNS lookup + the
+// referrer-policy dance that twimg.com requires.
+const AUTHOR_AVATAR = "/avatars/alifeiliu.jpg";
 
 function initials(name: string) {
   return name
@@ -33,12 +36,17 @@ function initials(name: string) {
 // Highlights every "Tokenscope" mention in the theme accent green so the
 // product name pops inside each review. The split regex matches the brand
 // name in both locale strings (it's kept English in the Chinese translations).
+// Hoisted to module scope — per `js-hoist-regexp`, a literal in a function
+// body recompiles on every call.
+const BRAND_SPLIT_RE = /(Tokenscope)/gi;
+const BRAND_TEST_RE = /tokenscope/i;
+
 function Quote({ text }: { text: string }) {
-  const parts = text.split(/(Tokenscope)/gi);
+  const parts = text.split(BRAND_SPLIT_RE);
   return (
     <>
       {parts.map((part, i) =>
-        /tokenscope/i.test(part) ? (
+        BRAND_TEST_RE.test(part) ? (
           <span key={i} className="font-medium text-accent">
             {part}
           </span>
@@ -66,15 +74,18 @@ function Card({ r }: { r: Review }) {
       </blockquote>
       <figcaption className="mt-auto flex items-center gap-3">
         {r.avatar ? (
-          // Decorative - the name + role sit beside it.
+          // Decorative - the name + role sit beside it. Explicit width+height
+          // attrs reserve the 44×44 box before bytes arrive (no CLS), and we
+          // skip referrerPolicy because the image is now same-origin.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={r.avatar}
             alt=""
+            width={88}
+            height={88}
             className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-border"
             loading="lazy"
             decoding="async"
-            referrerPolicy="no-referrer"
           />
         ) : (
           <span
@@ -112,7 +123,7 @@ export function Testimonials({ locale }: { locale: Locale }) {
   const loop = [...REVIEWS, ...REVIEWS];
 
   return (
-    <section className="pb-16 sm:pb-24">
+    <section className="cv-auto pb-16 sm:pb-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <Reveal as="div" className="mb-11 max-w-[640px]">
           <h2 className="font-display" style={{ fontSize: "clamp(30px,4vw,42px)" }}>

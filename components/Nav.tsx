@@ -5,20 +5,26 @@ import { ShareMenu } from "./ShareMenu";
 import { ThemeToggle } from "./ThemeToggle";
 import { LocaleSwitch } from "./LocaleSwitch";
 import { getDict, type Locale } from "@/lib/i18n";
+import type { Dict } from "@/lib/i18n";
 
 // Sticky glass nav. Server-rendered shell; the client islands are
 // <LogoLink/> (back-to-top click), <ThemeToggle/>, <LocaleSwitch/>, and
 // <ShareMenu/>. Glass sits at 38% opacity so the page content reads through
 // clearly as you scroll.
 
+// Anchor-link structure is locale-invariant — href stays, only label flips
+// per dict. Hoisted out of the function body so the array isn't rebuilt on
+// every render (per `rendering-hoist-jsx`).
+type NavLinkKey = Extract<keyof Dict["nav"], "breakdowns" | "how" | "pricing" | "faq">;
+const NAV_LINKS: { href: string; labelKey: NavLinkKey }[] = [
+  { href: "#breakdowns", labelKey: "breakdowns" },
+  { href: "#how", labelKey: "how" },
+  { href: "#pricing", labelKey: "pricing" },
+  { href: "#faq", labelKey: "faq" },
+];
+
 export function Nav({ locale }: { locale: Locale }) {
   const t = getDict(locale);
-  const links = [
-    { href: "#breakdowns", label: t.nav.breakdowns },
-    { href: "#how", label: t.nav.how },
-    { href: "#pricing", label: t.nav.pricing },
-    { href: "#faq", label: t.nav.faq },
-  ];
 
   return (
     <nav
@@ -33,13 +39,13 @@ export function Nav({ locale }: { locale: Locale }) {
         <LogoLink />
 
         <div className="hidden items-center gap-6 md:flex">
-          {links.map((l) => (
+          {NAV_LINKS.map((l) => (
             <AnchorLink
               key={l.href}
               href={l.href}
               className="text-[14px] font-medium text-dim transition-colors hover:text-text"
             >
-              {l.label}
+              {t.nav[l.labelKey]}
             </AnchorLink>
           ))}
         </div>

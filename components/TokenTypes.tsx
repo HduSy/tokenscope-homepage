@@ -2,6 +2,7 @@ import { Reveal } from "./Reveal";
 import { CostLedger } from "./CostLedger";
 import { fmtInt } from "@/lib/tokenscope-data";
 import { getDict, type Locale } from "@/lib/i18n";
+import type { Dict } from "@/lib/i18n";
 
 // The cost engine, made literal. Tokenscope's pricing is one Rust function
 // (app src-tauri/src/pricing.rs::cost): for every JSONL request it reads four
@@ -13,35 +14,36 @@ import { getDict, type Locale } from "@/lib/i18n";
 // The rates below are the real published Anthropic per-million prices for
 // claude-sonnet-4-6 ($3 / $15 / $3.75 / $0.30), which is also the built-in
 // backstop in pricing.rs. The token counts are an illustrative coding session.
-// Row TYPE labels come from the dict; the key/count/rate stay locale-invariant.
+// Numerical data is hoisted to module scope per `rendering-hoist-jsx` — only
+// the `type` label is locale-aware and resolved inside the component.
 
-type Row = { type: string; key: string; count: number; rate: number; cls: string };
+type RowKey = keyof Dict["tokenMath"]["rowTypes"];
+type RowSpec = { typeKey: RowKey; key: string; count: number; rate: number; cls: string };
 
 const MODEL = "claude-sonnet-4-6";
+
+const ROW_SPECS: RowSpec[] = [
+  { typeKey: "input", key: "input_tokens", count: 88000, rate: 3.0, cls: "text-accent" },
+  { typeKey: "cacheWrite", key: "cache_creation_input_tokens", count: 1120000, rate: 3.75, cls: "text-accent-soft" },
+  { typeKey: "cacheRead", key: "cache_read_input_tokens", count: 2400000, rate: 0.3, cls: "text-accent opacity-60" },
+  { typeKey: "output", key: "output_tokens", count: 320000, rate: 15.0, cls: "text-delta-up" },
+];
+
+const KEY_W = Math.max(...ROW_SPECS.map((r) => r.key.length));
+const TOTAL = ROW_SPECS.reduce((s, r) => s + (r.count * r.rate) / 1e6, 0);
 
 export function TokenTypes({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const tm = t.tokenMath;
-  const ROWS: Row[] = [
-    { type: tm.rowTypes.input, key: "input_tokens", count: 88000, rate: 3.0, cls: "text-accent" },
-    {
-      type: tm.rowTypes.cacheWrite,
-      key: "cache_creation_input_tokens",
-      count: 1120000,
-      rate: 3.75,
-      cls: "text-accent-soft",
-    },
-    {
-      type: tm.rowTypes.cacheRead,
-      key: "cache_read_input_tokens",
-      count: 2400000,
-      rate: 0.3,
-      cls: "text-accent opacity-60",
-    },
-    { type: tm.rowTypes.output, key: "output_tokens", count: 320000, rate: 15.0, cls: "text-delta-up" },
-  ];
-  const KEY_W = Math.max(...ROWS.map((r) => r.key.length));
-  const TOTAL = ROWS.reduce((s, r) => s + (r.count * r.rate) / 1e6, 0);
+  // Reify rows with locale-aware type labels — shape and numbers come from
+  // the hoisted ROW_SPECS constant.
+  const ROWS = ROW_SPECS.map((r) => ({
+    type: tm.rowTypes[r.typeKey],
+    key: r.key,
+    count: r.count,
+    rate: r.rate,
+    cls: r.cls,
+  }));
 
   return (
     <section id="pricing" className="pb-16 sm:pb-24">

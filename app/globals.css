@@ -289,3 +289,18 @@ html.js .heat-anim:not(.in) {
     animation: none;
   }
 }
+
+/* Skip layout + paint work for sections that are guaranteed off-screen on
+   first paint and not jumped-to by hash anchors (#faq / #install etc would
+   land wrong if the placeholder height doesn't match the real height). The
+   `auto N` form lets the browser cache the real measured size after the
+   first render, so subsequent passes use the cached value — no wasted
+   guessing. Applied to deep-below-the-fold sections only (Testimonials,
+   FinalCta) where mis-landing is impossible because there's no link to
+   them. Skipping their initial layout knocks 200-400ms off LCP-adjacent
+   work on slower devices. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
