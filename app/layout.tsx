@@ -58,12 +58,18 @@ export default function RootLayout({
                  html.js (Reveal, chart anims). Without JS this never runs →
                  those animations' hidden start state is skipped and the whole
                  page renders visible (SSR / no-JS safe).
-              2. If the user is on /zh, override the static lang="en" attribute
-                 with "zh-CN" so screen readers and dev-tools see the right
-                 value once hydration completes. Server crawlers reading raw
-                 HTML still see lang="en" on /zh — acceptable trade-off, since
-                 the canonical SEO signals (hreflang alternates, og:locale,
-                 body content) are still set correctly server-side.
+              2. Cookie-based locale redirect. If the visitor has a `locale`
+                 cookie that disagrees with the path they landed on, jump to
+                 the matching locale BEFORE first paint (location.replace → no
+                 history entry, behaves like a 307). Replaces what proxy.ts
+                 used to do server-side, so both / and /zh are now pure CDN
+                 static files with no Edge Function in the request path.
+              3. Override the static lang="en" attribute with "zh-CN" when on
+                 /zh so screen readers and dev-tools see the right value once
+                 hydration completes. Server crawlers reading raw HTML still
+                 see lang="en" on /zh — acceptable trade-off, since the
+                 canonical SEO signals (hreflang alternates, og:locale, body
+                 content) are still set correctly server-side.
             UI icons are inlined as SVG paths via <Icon/> (components/Icon.tsx) —
             no external icon-font stylesheet, so nothing else in <head> blocks
             first paint here. */}
@@ -71,7 +77,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html:
               "document.documentElement.classList.add('js');" +
-              "if(location.pathname.startsWith('/zh'))document.documentElement.lang='zh-CN';",
+              "(function(){var m=document.cookie.match(/(?:^|;\\s*)locale=(en|zh)/);" +
+              "var here=location.pathname.indexOf('/zh')===0?'zh':'en';" +
+              "if(m&&m[1]!==here){location.replace(m[1]==='zh'?'/zh':'/');return;}" +
+              "if(here==='zh')document.documentElement.lang='zh-CN';})();",
           }}
         />
         <ThemeInit />
