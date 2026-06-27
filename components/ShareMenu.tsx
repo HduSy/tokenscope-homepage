@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon, type IconName } from "./Icon";
+import { showToast } from "./Toast";
 import { SITE_URL } from "@/lib/site";
 import { getDict, type Locale } from "@/lib/i18n";
 
-// Share menu in the nav: a share icon opens a small popover with the five
-// platforms. Each entry builds the platform's share-intent URL from the live
-// page URL (so previews on *.vercel.app still share the right link) and the
-// site tagline, then opens in a new tab. Closes on outside-click or Escape.
+// Share menu in the nav: a share icon opens a small popover with a copy-link
+// shortcut + five social platforms. Each social entry builds the platform's
+// share-intent URL from the live page URL (so previews on *.vercel.app still
+// share the right link) and the site tagline, then opens in a new tab. The
+// copy-link row uses navigator.clipboard and surfaces success/failure via the
+// shared Toast host. Closes on outside-click or Escape.
 
 const enc = encodeURIComponent;
 
@@ -70,6 +73,14 @@ export function ShareMenu({ locale }: { locale: Locale }) {
   // server-side — it's behind the `open` gate).
   const url = typeof window !== "undefined" ? window.location.href : SITE_URL;
 
+  const onCopyLink = () => {
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => showToast(dict.nav.linkCopied))
+      .catch(() => showToast(dict.nav.linkCopyFailed));
+    setOpen(false);
+  };
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -92,6 +103,19 @@ export function ShareMenu({ locale }: { locale: Locale }) {
           // rightward only fits without overflow above ~1440px of width.
           className="absolute top-11 z-50 w-44 right-0 min-[1440px]:left-0 min-[1440px]:right-auto overflow-hidden rounded-[var(--radius-md)] border border-border bg-card p-1.5 shadow-[var(--shadow-card)]"
         >
+          {/* Copy link — same row styling as the social entries, separated by
+              a hairline divider since it's a different kind of action (no
+              external nav, no new tab). */}
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onCopyLink}
+            className="flex w-full cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-left text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
+          >
+            <Icon name="copy" size={17} />
+            {dict.nav.copyLink}
+          </button>
+          <div role="separator" className="my-1 border-t border-border" />
           {PLATFORMS.map((p) => (
             <a
               key={p.name}

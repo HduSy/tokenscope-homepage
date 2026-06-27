@@ -51,6 +51,9 @@ export const zh: Dict = {
     en: "EN",
     zh: "中",
     skipToContent: "跳到主要内容",
+    copyLink: "复制链接",
+    linkCopied: "链接已复制",
+    linkCopyFailed: "复制失败，请手动复制 URL",
   },
 
   hero: {

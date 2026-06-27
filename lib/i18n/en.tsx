@@ -64,6 +64,9 @@ export const en = {
     en: "EN",
     zh: "中",
     skipToContent: "Skip to content",
+    copyLink: "Copy link",
+    linkCopied: "Link copied",
+    linkCopyFailed: "Copy failed — select the URL manually",
   },
 
   // ── Hero (top of page) ─
