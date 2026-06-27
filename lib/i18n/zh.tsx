@@ -57,7 +57,7 @@ export const zh: Dict = {
     pill: "Claude Code 的 macOS 菜单栏小工具",
     h1Lead: "看清你的 Claude Code",
     h1Accent: "到底花了多少钱",
-    sub: "一个常驻菜单栏的小工具，显示每日 Token 费用、按模型拆分、MCP 与 Skill 调用次数。只读，零打扰。",
+    sub: "一个常驻菜单栏的小工具，显示每日 Token 费用、按模型拆分、MCP 与 Skill 调用次数。只读，不会打扰你。",
   },
 
   cta: {
@@ -66,7 +66,7 @@ export const zh: Dict = {
   },
 
   pipeline: {
-    h2: "天生只读 —— 无遥测，无需 API key。",
+    h2: "天生只读，没有遥测，不需要 API key。",
     intro:
       "Tokenscope 直接读取 Claude Code 写在你磁盘里的 JSONL 日志。不需要 API key，不调用 Anthropic 接口，所有数据都留在你的 Mac 上。",
     steps: {
@@ -125,7 +125,7 @@ export const zh: Dict = {
       title: "缓存改变一切",
       pctSuffix: "% 命中缓存",
       footnote:
-        "缓存命中高的日子，Token 数巨大但账单依然不高 —— 缓存读取走的是它自己的便宜单价，并不是按新输入计费的。",
+        "缓存命中高的日子，Token 数很大但账单照样不高：缓存读取走的是它自己的便宜单价，不是按新输入计费的。",
     },
     requests: "请求数",
     sessionsSuffix: "次会话",
@@ -146,7 +146,7 @@ export const zh: Dict = {
   tokenMath: {
     h2: "你的 Claude Code Token 费用是怎么算出来的。",
     intro:
-      "每条 JSONL 请求都记录了四种 Token 数。Tokenscope 按会话累加，每种 Token 各自乘以对应单价，四项相加 —— 整个引擎就这么简单。",
+      "每条 JSONL 请求都记录了四种 Token 数。Tokenscope 按会话累加，每种 Token 乘以对应单价，把四项加起来。整个计费引擎，就这些。",
     codeComment: "一次编码会话",
     rowTypes: {
       input: "输入",
@@ -161,7 +161,7 @@ export const zh: Dict = {
       totalLabel: "总计 · 单次会话",
     },
     closingRates:
-      "单价优先取自 models.dev，其次 LiteLLM，离线时兜底使用内置快照，本地缓存 24 小时。面板里把缓存折进“In”只是显示口径；计费始终走上面这四项各自的单价。",
+      "单价优先取自 models.dev，其次 LiteLLM，离线时兜底使用内置快照，本地缓存 24 小时。面板里把缓存折进“In”只是显示口径；计费始终按上面这四项各自的单价来。",
     closingExample: {
       lead: "注意",
       cacheTokens: "240 万 个缓存读取 Token",
@@ -169,7 +169,7 @@ export const zh: Dict = {
       mid: "同一次会话的",
       outputTokens: "32 万 个输出 Token",
       outputCost:
-        "却花了 $4.80 —— Token 数少了一大截，费用却高出六倍。账单从来不由 Token 总数决定，而是看每种类型各自的单价。",
+        "却花了 $4.80。Token 数少了一大截，费用反而高出六倍。账单看的是每种类型各自的单价，不是 Token 总数。",
     },
   },
 
@@ -238,7 +238,7 @@ export const zh: Dict = {
       {
         q: "Tokenscope 和 ccusage 有什么不同？",
         aPlain:
-          "ccusage（github.com/ryoppippi/ccusage）是一个命令行工具，读的是同一份 JSONL：跑 npx ccusage，在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想要不打字就能持续感知的，用 Tokenscope。",
+          "ccusage（github.com/ryoppippi/ccusage）是一个命令行工具，读的是同一份 JSONL：跑 npx ccusage，在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想随手瞥一眼就知道用了多少的，用 Tokenscope。",
         a: (
           <>
             <a
@@ -251,7 +251,7 @@ export const zh: Dict = {
               ccusage
             </a>{" "}
             是一个命令行工具，读的是同一份 JSONL。跑{" "}
-            <code className={code}>npx ccusage</code> 就能在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想要不打字就能持续感知的，用 Tokenscope。
+            <code className={code}>npx ccusage</code> 就能在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想随手瞥一眼就知道用了多少的，用 Tokenscope。
           </>
         ),
       },
@@ -272,7 +272,7 @@ export const zh: Dict = {
           "目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式不一样。如果你想加一个，去 GitHub repo 上提个 issue，附上脱敏过的日志样例，我会写一个 parser。",
         a: (
           <>
-            目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式不一样 —— 如果你想加一个，去{" "}
+            目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式不一样。想加一个的话，去{" "}
             <a
               href="https://github.com/HduSy/tokenscope/issues"
               target="_blank"
@@ -311,7 +311,7 @@ export const zh: Dict = {
 
   testimonials: {
     h2: "正在追踪 Claude Code 费用的开发者怎么说。",
-    intro: "几位开发者装上 Tokenscope 之后就没卸过 —— 他们的反馈。",
+    intro: "几位开发者装上 Tokenscope 之后就没卸过，下面是他们的反馈。",
     role: "全栈（前端）工程师",
     ariaPrefix: "在 X 上查看",
     ariaSuffix: "",
