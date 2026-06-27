@@ -88,11 +88,7 @@ export function TokenTypes({ locale }: { locale: Locale }) {
           <CostLedger rows={ROWS} total={TOTAL} labels={tm.ledger} />
         </Reveal>
 
-        <Reveal as="p" delayIndex={2} className="mt-6 max-w-[68ch] text-[14px] leading-[1.6] text-dim">
-          {tm.closingRates}
-        </Reveal>
-
-        <Reveal as="p" delayIndex={3} className="mt-3 max-w-[68ch] text-[15px] leading-[1.55] text-text">
+        <Reveal as="p" delayIndex={2} className="mt-3 max-w-[68ch] text-[15px] leading-[1.55] text-text">
           {tm.closingExample.lead}{" "}
           <span className="font-medium text-accent opacity-80">
             {tm.closingExample.cacheTokens}

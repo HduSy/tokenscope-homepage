@@ -27,7 +27,7 @@ export function Hero({ locale }: { locale: Locale }) {
             style={{ fontSize: "clamp(36px,6vw,64px)" }}
           >
             {t.hero.h1Lead}{" "}
-            <em className="not-italic text-accent">{t.hero.h1Accent}</em>.
+            <em className="not-italic text-accent">{t.hero.h1Accent}</em>
           </h1>
           <p className="mt-5 max-w-[50ch] text-[18px] leading-[1.55] text-dim">
             {t.hero.sub}

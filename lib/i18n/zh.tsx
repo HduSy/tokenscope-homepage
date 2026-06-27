@@ -1,10 +1,9 @@
 // Chinese (Simplified) dictionary. Conforms to the `Dict` type derived from
 // en.tsx — TypeScript flags any missing key or shape mismatch.
 //
-// Translation register: 口语化偏技术, mirrors the English tone — direct, no
-// hedging, occasional accent. Brand names (Tokenscope, Claude Code, Anthropic,
-// MCP, Skill, models.dev, LiteLLM, Homebrew, GLM-5.2, ccusage) stay in Latin;
-// "Token" stays as "Token" since that's how Chinese developers write it.
+// Brand names (Tokenscope, Claude Code, Anthropic, MCP, Skill, models.dev,
+// LiteLLM, Homebrew, GLM-5.2, ccusage) stay in Latin; "Token" stays as
+// "Token" since that's how Chinese developers write it.
 
 import type { Dict, FaqItem } from "./en";
 
@@ -20,18 +19,18 @@ export const zh: Dict = {
   site: {
     tagline: "Claude Code Token 费用，全在你的 macOS 菜单栏",
     description:
-      "一个 macOS 菜单栏小工具，实时显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
+      "一款 macOS 菜单栏应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
     ogDescription:
-      "看清你的 Claude Code 消耗了多少 Token、花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的菜单栏。",
+      "随时查看你的 Claude Code 消耗了多少、花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的 macOS 菜单栏。",
     ogAlt: "Tokenscope — Claude Code Token 费用，全在你的 macOS 菜单栏",
   },
 
   jsonLd: {
     description:
-      "一个 macOS 菜单栏小工具，实时显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
+      "一款 macOS 菜单栏应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
     features: [
-      "在 macOS 菜单栏中查看每日、每周、每月的 Claude Code Token 费用",
-      "按四种 Token 类型（输入、缓存写入、缓存读取、输出）分别计价，价格来自 models.dev 与 LiteLLM",
+      "在 macOS 菜单栏中按日、周、月查看 Claude Code Token 费用",
+      "按四种 Token 类型（输入、缓存写入、缓存读取、输出）分别估算费用，价格来自 models.dev 与 LiteLLM",
       "按模型拆分的 Token 与费用明细",
       "MCP 服务与 Skill 调用次数统计",
       "GitHub 风格的每日活动热力图",
@@ -40,9 +39,9 @@ export const zh: Dict = {
   },
 
   nav: {
-    breakdowns: "明细",
+    breakdowns: "面板明细",
     how: "工作原理",
-    pricing: "费用算法",
+    pricing: "费用计算",
     faq: "常见问题",
     github: "在 GitHub 上查看",
     share: "分享",
@@ -54,27 +53,29 @@ export const zh: Dict = {
   },
 
   hero: {
-    pill: "Claude Code 的 macOS 菜单栏小工具",
-    h1Lead: "看清你的 Claude Code",
-    h1Accent: "消耗了多少 Token，花了多少钱",
-    sub: "一个常驻菜单栏的小工具，显示每日 Token 费用、按模型拆分、MCP 与 Skill 调用次数。只读，不会打扰你。",
+    pill: "适用于 Claude Code 的 macOS 菜单栏小工具",
+    h1Lead: "随时查看你的 Claude Code",
+    h1Accent: "消耗了多少 Token，花了多少钱。",
+    sub: "一个常驻菜单栏的 dashboard，以模型维度统计每日/周/月 Token 消耗量与费用，以及 MCP 与 Skill 调用次数。只读，零侵入。",
   },
 
   cta: {
-    install: "用 Homebrew 安装",
+    install: "通过 Homebrew 安装",
     github: "在 GitHub 上查看",
   },
 
   pipeline: {
-    h2: "天生只读，没有遥测，不需要 API key。",
+    h2: "只读、不上传数据，也不需要 API key。",
     intro:
-      "Tokenscope 直接读取 Claude Code 写在你磁盘里的 JSONL 日志。不需要 API key，不调用 Anthropic 接口，所有数据都留在你的 Mac 上。",
+      "Tokenscope 直接读取 Claude Code 写到磁盘中的 JSONL 请求日志文件。不上传，不需要 API key，也不调用 Anthropic 接口，所有数据都留在你的 Mac 上。不存在安全隐私问题，也不追踪分析使用数据。",
     steps: {
       read: {
         title: "读取",
         body: (
           <>
-            扫描 <code className={code}>~/.claude/projects/**/*.jsonl</code>，把每一条 assistant 消息、它的 usage、模型与工具调用都解析出来。
+            扫描{" "}
+            <code className={code}>~/.claude/projects/**/*.jsonl</code>，解析每一条
+            assistant 消息的 usage、模型和工具调用。
           </>
         ),
       },
@@ -82,7 +83,8 @@ export const zh: Dict = {
         title: "去重",
         body: (
           <>
-            按 <code className={code}>message.id</code> 折叠流式重试，合并多段消息，确保每一轮只统计一次。
+            按 <code className={code}>message.id</code>{" "}
+            去重，合并多段消息，每轮只统计一次。
           </>
         ),
       },
@@ -90,7 +92,27 @@ export const zh: Dict = {
         title: "计价",
         body: (
           <>
-            优先匹配 models.dev，其次 LiteLLM，最后兜底使用内置的价格快照。本地缓存 24 小时，离线也能用。
+            优先从{" "}
+            <a
+              href="https://models.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              models.dev
+            </a>{" "}
+            获取，其次{" "}
+            <a
+              href="https://github.com/BerriAI/litellm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              LiteLLM
+            </a>
+            ，兜底使用内置快照。本地缓存有效期 24 小时，保证离线下可用。
           </>
         ),
       },
@@ -98,7 +120,7 @@ export const zh: Dict = {
         title: "展示",
         body: (
           <>
-            菜单栏上实时显示今日总额，点开就是完整看板，后台自动刷新。
+            菜单栏实时显示用量，点开查看完整看板，后台每 30s 自动刷新，并支持右键主动刷新。
           </>
         ),
       },
@@ -106,26 +128,28 @@ export const zh: Dict = {
   },
 
   breakdowns: {
-    h2: "日、周、月 Token 费用明细。",
+    h2: "每日/周/月的 Token 消耗明细。",
     intro:
-      "Token 按模型拆，调用按 MCP / Skill 拆。一眼看出哪些模型在烧钱、哪些工具你装了但根本没用。",
+      "按模型占比、MCP、Skill 调用次数进行统计，一眼看出哪些模型更烧钱、经常用的是哪些工具。",
     costByModel: {
-      title: "按模型看费用",
-      sub: "看清这段时间钱到底花在了哪。",
+      title: "模型费用占比",
+      sub: "每个周期，钱都花在哪些模型上。",
     },
     tools: {
-      title: "你真正在用的工具",
-      sub: "只统计你自己装的 MCP 服务和 Skill。",
+      title: "你用过的工具",
+      sub: "只显示你自己安装的 MCP 和 Skill。",
     },
     year: {
-      title: "全年活动",
-      sub: "过去十二个月，每天的 Token 用量。",
+      title: "Token 消耗热图",
+      sub: "过去十二个月的每日 Token 用量。",
     },
     cache: {
       title: "缓存改变一切",
       pctSuffix: "% 命中缓存",
       footnote:
-        "缓存命中高的日子，Token 数很大但账单照样不高：缓存读取走的是它自己的便宜单价，不是按新输入计费的。",
+        "Claude Code 会把长上下文写入提示缓存（cache write），下次同样的请求直接从缓存重放（cache read）。" +
+        "缓存写入比普通输入贵约 25%，缓存命中的单价却只有普通输入的约 10%。" +
+        "一段持续会话里，系统提示、项目文件、工具描述会被反复作为上下文携带，命中率越高账单越省。",
     },
     requests: "请求数",
     sessionsSuffix: "次会话",
@@ -137,8 +161,9 @@ export const zh: Dict = {
     skills: "个 Skill",
     emptyMcp: "本周没有 MCP 调用",
     emptySkills: "本周没有 Skill 调用",
-    mcpFootnote: "Anthropic 自带的 MCP 和所有内置工具已被过滤掉。",
-    skillFootnotePrefix: "从你自己的",
+    mcpFootnote:
+      "Anthropic 自带的所有 MCP 和内置工具已被过滤掉。",
+    skillFootnotePrefix: "从你的",
     skillFootnotePath: "~/.claude/skills/",
     skillFootnoteSuffix: "目录读取。",
   },
@@ -146,7 +171,7 @@ export const zh: Dict = {
   tokenMath: {
     h2: "你的 Claude Code Token 费用是怎么算出来的。",
     intro:
-      "每条 JSONL 请求都记录了四种 Token 数。Tokenscope 按会话累加，每种 Token 乘以对应单价，把四项加起来。整个计费引擎，就这些。",
+      "每条 JSONL 请求记录着用量。Tokenscope 会按会话汇总，分别乘以模型对应类型的单价，再把四项加起来，就得到了本次请求的总花费。",
     codeComment: "一次编码会话",
     rowTypes: {
       input: "输入",
@@ -160,32 +185,30 @@ export const zh: Dict = {
       cost: "费用",
       totalLabel: "总计 · 单次会话",
     },
-    closingRates:
-      "单价优先取自 models.dev，其次 LiteLLM，离线时兜底使用内置快照，本地缓存 24 小时。面板里把缓存折进“In”只是显示口径；计费始终按上面这四项各自的单价来。",
     closingExample: {
       lead: "注意",
-      cacheTokens: "240 万 个缓存读取 Token",
+      cacheTokens: "2.4M 的缓存读取 Token",
       cacheCost: "只花了 $0.72。",
-      mid: "同一次会话的",
-      outputTokens: "32 万 个输出 Token",
+      mid: "而",
+      outputTokens: "0.32M 的输出 Token",
       outputCost:
-        "却花了 $4.80。Token 数少了一大截，费用反而高出六倍。账单看的是每种类型各自的单价，不是 Token 总数。",
+        "却花了 $4.80。消耗少了，费用反而高出六倍。费用由不同模型不同类型的输入输出单价合计，仅供参考，以实际账单为准。",
     },
   },
 
   install: {
-    h2: "一行 Homebrew 就能装好。",
+    h2: "一行 Homebrew 命令即可安装。",
     intro:
-      "Homebrew 会替你清掉隔离标记，所以第一次就能直接打开。装好以后，每次开机都会自动起在菜单栏里。",
+      "Homebrew 会替你清除隔离标记，打开即用。之后每次开机都会自动运行在菜单栏中。",
     copyBtn: "复制",
     toastCopied: "已复制安装命令",
     toastFallback: "请手动选中并复制",
     directDownload: {
-      lead: "想直接下载？去 GitHub Releases 拿通用版的",
+      lead: "想直接下载？去 GitHub Releases 下载通用版",
       linkText: ".dmg",
       tail: (
         <>
-          。它是未签名构建，所以首次打开时要右键 → 打开，或者一次性运行{" "}
+          。它是未签名构建，所以首次启动后需要右键单击选择打开，或者在命令行中运行一次{" "}
           <code className={code}>
             xattr -cr /Applications/Tokenscope.app
           </code>
@@ -197,48 +220,92 @@ export const zh: Dict = {
 
   faq: {
     h2: "常见问题。",
-    intro: "运行 brew install 之前，开发者们最常问到的几个问题。",
+    intro: "人们在选择 Tokenscope 之前通常会问到的问题。",
     items: [
       {
-        q: "Tokenscope 会不会把我的数据传到网络上？",
+        q: "Tokenscope 会不会把我的数据发送到网络上？",
         aPlain:
-          "不会。Tokenscope 只读取 Claude Code 已经写在 ~/.claude/projects/ 里的 JSONL 日志，按本地缓存的 models.dev 和 LiteLLM 价格快照计费，结果显示在菜单栏里。无遥测、无账号、无 API key。",
+          "不会。Tokenscope 直接读取 Claude Code 写在 ~/.claude/projects/ 里的 JSONL 日志，用本地缓存的 models.dev 和 LiteLLM 价格快照计价，将统计结果显示在 dashboard 中。不收集遥测数据，不需要账号，也不需要 API key。",
         a: (
           <>
-            不会。它只读取 Claude Code 已经写在{" "}
-            <code className={code}>~/.claude/projects/</code> 里的 JSONL 日志，按本地缓存的 models.dev / LiteLLM 价格快照计费，结果显示在你的菜单栏。无遥测、无账号、无 API key。
+            不会。它直接读取 Claude Code 写在{" "}
+            <code className={code}>~/.claude/projects/</code>{" "}
+            里的 JSONL 日志，用本地缓存的{" "}
+            <a
+              href="https://models.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              models.dev
+            </a>{" "}
+            和{" "}
+            <a
+              href="https://github.com/BerriAI/litellm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              LiteLLM
+            </a>{" "}
+            价格快照计价，将统计结果显示在你的 dashboard
+            中。不收集遥测数据，不需要账号，也不需要 API key。
           </>
         ),
       },
       {
-        q: ".dmg 提示来自未认证的开发者，怎么办？",
+        q: "为什么 .dmg 会提示来自未认证的开发者？",
         aPlain:
-          "这个 cask 还没走 Apple Developer 公证。Homebrew 会替你清掉隔离标记，所以 brew 安装方式第一次就能直接打开。如果是直接下载的 .dmg，第一次右键 → 打开，或者一次性运行 xattr -cr /Applications/Tokenscope.app 即可。",
+          "这个 cask 还没通过 Apple Developer 计划公证。Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用。如果是直接下载 .dmg，第一次右键点击选择打开，或者运行一次 xattr -cr /Applications/Tokenscope.app 再打开。",
         a: (
           <>
-            这个 cask 暂时还没走 Apple Developer 的公证。Homebrew 会替你清掉隔离标记，所以 brew 那条路第一次就能正常打开。如果你是直接下载{" "}
-            <code className={code}>.dmg</code>，第一次右键 → 打开，或者一次性运行{" "}
+            这个 cask 还没通过 Apple Developer 计划公证。Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用。如果是直接下载{" "}
+            <code className={code}>.dmg</code>，第一次右键 → 打开，或者运行一次{" "}
             <code className={code}>
               xattr -cr /Applications/Tokenscope.app
             </code>{" "}
-            即可。
+            再打开。
           </>
         ),
       },
       {
-        q: "费用数字准不准？",
+        q: "花费计算",
         aPlain:
-          "四种 Token 类型（输入、缓存写入、缓存读取、输出）各自按自己的单价计算，价格优先取自 models.dev，其次 LiteLLM，离线时兜底使用内置快照。本地缓存 24 小时。对于有公开报价的 Claude 模型，数字和 Anthropic 的账单精确到分；没有公开定价的模型会在面板里标为 “unpriced”。",
+          "输入输出类型（输入、缓存写入、缓存读取、输出）分别按对应单价计算，价格优先从 models.dev 获取，其次 LiteLLM，离线时兜底使用内置快照。价格数据本地缓存有效期 24 小时。对于有公开报价的 Claude 模型，数字和 Anthropic 的账单精确到分；没有公开定价的模型暂时在面板里标记为 unpriced。",
         a: (
           <>
-            四种 Token 类型 —— 输入、缓存写入、缓存读取、输出 —— 各自按自己的单价计算，价格优先取自 models.dev，其次 LiteLLM，离线时兜底使用内置快照。本地缓存 24 小时。对于有公开报价的 Claude 模型，数字和 Anthropic 的账单精确到分；没有公开定价的模型会在面板里标记为 &ldquo;unpriced&rdquo;。
+            输入输出类型——输入、缓存写入、缓存读取、输出——分别按对应单价计算，价格优先从{" "}
+            <a
+              href="https://models.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              models.dev
+            </a>{" "}
+            获取，其次{" "}
+            <a
+              href="https://github.com/BerriAI/litellm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              LiteLLM
+            </a>
+            ，离线时兜底使用内置快照。价格数据本地缓存有效期 24 小时。对于有公开报价的 Claude
+            模型，数字和 Anthropic 的账单精确到分；没有公开定价的模型暂时在面板里标记为
+            &ldquo;unpriced&rdquo;。
           </>
         ),
       },
       {
         q: "Tokenscope 和 ccusage 有什么不同？",
         aPlain:
-          "ccusage（github.com/ryoppippi/ccusage）是一个命令行工具，读的是同一份 JSONL：跑 npx ccusage，在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想随手瞥一眼就知道用了多少的，用 Tokenscope。",
+          "ccusage（github.com/ryoppippi/ccusage）是一个终端命令行工具，读的是同一份 JSONL 文件。运行 npx ccusage 后，在 shell 里得到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev 和 LiteLLM 价格表，但以菜单栏 GUI 的形式呈现。今天的 Token 费用始终可见，面板里还有柱状图、圆环图、热力图。需要可脚本化的终端命令就用 ccusage；想随时可视化用量，就用 Tokenscope。",
         a: (
           <>
             <a
@@ -250,29 +317,51 @@ export const zh: Dict = {
             >
               ccusage
             </a>{" "}
-            是一个命令行工具，读的是同一份 JSONL。跑{" "}
-            <code className={code}>npx ccusage</code> 就能在终端里看到一次性汇总。Tokenscope 读同样的日志、用同样的 models.dev / LiteLLM 价格表，但呈现形式是菜单栏 GUI：今天的 Token 费用一直挂在屏幕上，面板里还有柱状图、热力图和截图分享。需要可脚本化的命令行用 ccusage；想随手瞥一眼就知道用了多少的，用 Tokenscope。
+            是一个终端命令行工具，读的是同一份 JSONL 文件。运行{" "}
+            <code className={code}>npx ccusage</code>{" "}
+            后，在 shell 里得到一次性汇总。Tokenscope 读同样的日志、用同样的{" "}
+            <a
+              href="https://models.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              models.dev
+            </a>{" "}
+            /{" "}
+            <a
+              href="https://github.com/BerriAI/litellm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              LiteLLM
+            </a>{" "}
+            价格表，但以菜单栏 GUI 的形式呈现：今天的 Token 费用始终可见，面板里还有柱状图、圆环图、热力图。需要可脚本化的终端命令就用 ccusage；想随时可视化用量，就用 Tokenscope。
           </>
         ),
       },
       {
         q: "会不会拖慢我的 Mac？",
         aPlain:
-          "不会。菜单栏进程监听项目目录的文件变化，只重新解析 mtime 改动过的文件。空闲时 CPU 基本为零，内存稳定在几十 MB。刷新面板时只过一遍上次读取后新增的 JSONL 字节。",
+          "不会。菜单栏进程只监听项目目录的文件变化，仅重新解析 mtime 有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。",
         a: (
           <>
-            菜单栏进程会监听项目目录的文件变化，只重新解析{" "}
-            <code className={code}>mtime</code> 改动过的文件。空闲时 CPU 基本为零，内存稳定在几十 MB。刷新面板就是从上次位置往后扫一遍新增的 JSONL 字节。
+            菜单栏进程监听项目目录的文件变化，仅重新解析{" "}
+            <code className={code}>mtime</code>{" "}
+            有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。
           </>
         ),
       },
       {
-        q: "支持 Cursor、Codex CLI 或者其他终端工具吗？",
+        q: "支持 Cursor、Codex CLI 或者其他终端吗？",
         aPlain:
-          "目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式不一样。如果你想加一个，去 GitHub repo 上提个 issue，附上脱敏过的日志样例，我会写一个 parser。",
+          "目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式各不相同。想去支持某个工具？去 GitHub repo 上提个 issue，附上脱敏后的日志样例，我会考虑增加一种支持。",
         a: (
           <>
-            目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式不一样。想加一个的话，去{" "}
+            目前只解析 Claude Code 的 JSONL 格式。其他工具的日志格式各不相同——想要支持某个工具的话，去{" "}
             <a
               href="https://github.com/HduSy/tokenscope/issues"
               target="_blank"
@@ -282,17 +371,17 @@ export const zh: Dict = {
             >
               repo
             </a>{" "}
-            上提个 issue，附上脱敏过的日志样例，我会写一个 parser。
+            上提个 issue，附上脱敏后的日志样例，我会考虑增加一种支持。
           </>
         ),
       },
       {
         q: "真的完全免费吗？",
         aPlain:
-          "是。MIT 协议，没有付费版本，也没有遥测数据可卖。源代码在 github.com/HduSy/tokenscope。",
+          "是的。Tokenscope 采用 MIT 协议，没有付费版本，也不会出售你的数据。源码在 github.com/HduSy/tokenscope。",
         a: (
           <>
-            是。MIT 协议，没有付费版本，也没有遥测数据可卖。源代码在{" "}
+            是的。MIT 协议，没有付费版本，也不会出售你的数据。仓库地址：{" "}
             <a
               href="https://github.com/HduSy/tokenscope"
               target="_blank"
@@ -310,8 +399,8 @@ export const zh: Dict = {
   },
 
   testimonials: {
-    h2: "正在追踪 Claude Code 费用的开发者怎么说。",
-    intro: "几位开发者装上 Tokenscope 之后就没卸过，下面是他们的反馈。",
+    h2: "正在使用 Tokenscope 的开发者如何评价。",
+    intro: "几位开发者装上 Tokenscope 之后就没卸载过，下面是他们的反馈。",
     role: "全栈（前端）工程师",
     ariaPrefix: "在 X 上查看",
     ariaSuffix: "",
@@ -326,8 +415,8 @@ export const zh: Dict = {
   },
 
   finalCta: {
-    h2: "开始追踪你的 Token。",
-    sub: "免费、MIT 协议，常驻你的菜单栏。",
+    h2: "开始关注你的 Token 用量。",
+    sub: "免费，MIT 协议，常驻你的菜单栏。",
   },
 
   footer: {
@@ -338,9 +427,9 @@ export const zh: Dict = {
       install: "安装",
     },
     links: {
-      breakdowns: "明细",
+      breakdowns: "面板明细",
       how: "工作原理",
-      pricing: "费用算法",
+      pricing: "费用计算",
       faq: "常见问题",
       github: "GitHub",
       releases: "Releases",
@@ -366,9 +455,9 @@ export const zh: Dict = {
     cachedSuffix: "cached",
     tokensByModel: "Tokens by model",
     costByModel: "Cost by model",
-    emptyUsage: "这段时间没有用量",
-    emptyMcp: "这段时间没有 MCP 调用",
-    emptySkill: "这段时间没有 Skill 调用",
+    emptyUsage: "该时段无使用记录",
+    emptyMcp: "该时段无 MCP 调用",
+    emptySkill: "该时段无 Skill 调用",
     requests: "Requests",
     sessionsSuffix: "次会话",
     costTrend: "Cost trend",
