@@ -49,6 +49,30 @@ const FAQS: Faq[] = [
     ),
   },
   {
+    q: "How does Tokenscope compare to ccusage?",
+    a: (
+      <>
+        <a
+          href="https://github.com/ryoppippi/ccusage"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent"
+          style={{
+            borderBottom: "1px solid color-mix(in srgb, var(--color-accent) 40%, transparent)",
+          }}
+        >
+          ccusage
+        </a>{" "}
+        is a terminal CLI over the same JSONL files. Run{" "}
+        <code className={code}>npx ccusage</code> and you get a one-shot summary in the shell.
+        Tokenscope reads the same logs and uses the same models.dev / LiteLLM rate tables, but as a
+        menu-bar GUI: today&apos;s token cost is always visible, the panel adds bar charts, a
+        heatmap, and screenshot sharing. Reach for ccusage when you want a scriptable terminal
+        command; reach for Tokenscope when you want ambient awareness without typing one.
+      </>
+    ),
+  },
+  {
     q: "Will it slow down my Mac?",
     a: (
       <>

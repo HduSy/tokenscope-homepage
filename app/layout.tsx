@@ -144,6 +144,10 @@ const FAQS: { q: string; a: string }[] = [
     a: "Each of the four token buckets (input, cache write, cache read, and output) is priced by its own rate, pulled from models.dev first, LiteLLM as a fallback, then a built-in snapshot when offline. Rates cache for 24 hours on disk. The numbers track Anthropic's billing to the cent for priced Claude models; models with no published pricing are flagged as unpriced.",
   },
   {
+    q: "How does Tokenscope compare to ccusage?",
+    a: "ccusage (github.com/ryoppippi/ccusage) is a terminal CLI over the same JSONL files: run `npx ccusage` and you get a one-shot summary in the shell. Tokenscope reads the same logs and uses the same models.dev and LiteLLM rate tables, but as a menu-bar GUI. Today's token cost is always visible, and the panel adds bar charts, a heatmap, and screenshot sharing. Reach for ccusage when you want a scriptable terminal command; reach for Tokenscope when you want ambient awareness without typing one.",
+  },
+  {
     q: "Will it slow down my Mac?",
     a: "No. The menu-bar process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory hovers in the low tens of MB. Refreshing the panel is a single pass over the new JSONL bytes since the last read.",
   },
