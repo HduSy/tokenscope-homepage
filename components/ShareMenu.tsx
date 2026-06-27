@@ -11,15 +11,24 @@ import { getDict, type Locale } from "@/lib/i18n";
 //
 //   EN: X / Reddit / Facebook / Telegram / WhatsApp — every platform has a
 //       web share-intent URL, so each row is a plain <a target="_blank">.
+//       Same menu on desktop and mobile.
 //
-//   ZH: 微信 / 朋友圈 / 小红书 / 微博 / QQ / QQ空间 — Weibo/QQ/QQ空间 have
-//       web share URLs and behave like the English ones. WeChat / Moments /
-//       Xiaohongshu have no public share intent, so:
-//         • on mobile (navigator.share present), we trigger the system share
-//           sheet — Chinese mobiles include WeChat / Moments / Xiaohongshu in
-//           it natively, no JSSDK / signed account required.
-//         • on desktop (no navigator.share), we open a QR-code modal so the
-//           visitor can scan with their phone and share from inside the app.
+//   ZH (desktop): 微信 / 朋友圈 / 小红书 / 微博 / QQ / QQ空间. Weibo/QQ/QQ空间
+//       have web share URLs (which double as universal links into the
+//       installed app on mobile, but mobile ZH doesn't see them — see below).
+//       WeChat / Moments / Xiaohongshu have no public share intent at all,
+//       so they open a QR-code modal: the visitor scans with their phone
+//       and shares from inside the app.
+//
+//   ZH (mobile): only the copy-link row. None of the six Chinese apps
+//       expose a public "open-share-with-URL" deep link to an external web
+//       page (WeChat/Moments require JSSDK + signed accessToken; Weibo/QQ
+//       require server-signed OpenSDK calls; Xiaohongshu's publish flow
+//       is partner-only). Trying to hand off to schemes / universal links
+//       from a static site is best-effort at best and confusing at worst
+//       (toast says "paste in WeChat", user lands on WeChat home with no
+//       further context). Copy-link is the only path that works reliably
+//       on every Chinese phone, every browser, every app version.
 //
 // All share URLs (and the QR-code text) use window.location.href so preview
 // deploys share the right link; SITE_URL is only a safety fallback for the
@@ -78,71 +87,57 @@ type ZhPlatform = {
   key: ZhPlatformKey;
   icon: IconName;
   // tint applied to the icon — brand colors give the row visual weight that
-  // the monochrome English entries don't need (the English icons are full-bleed
-  // glyphs, the Simple Icons ones are negative-space marks that read better
-  // tinted).
+  // the monochrome English entries don't need (the English icons are full-
+  // bleed glyphs, the Simple Icons ones are negative-space marks that read
+  // better tinted).
   tint: string;
-  // kind === "url" → plain external link, just like the English rows.
-  // kind === "qr"  → no public share intent (the platform doesn't expose one
-  //                  outside its own webview / signed JSSDK). On desktop we
-  //                  show a QR modal; on mobile we copy the URL to the
-  //                  clipboard and try to open the app via URL scheme so the
-  //                  user can paste into a chat / post.
+  // kind === "url" → plain external link, same shape as the English rows.
+  //                  iOS/Android with the app installed get the universal-
+  //                  link redirect; everyone else sees the web share form.
+  // kind === "qr"  → no public share intent. Opens a QR modal (desktop
+  //                  only — mobile ZH doesn't render any platform row).
 } & (
   | { kind: "url"; href: (url: string, title: string) => string }
-  // `scheme` is the iOS-style URL scheme used to open the app from a mobile
-  // browser. Most Chinese apps register the same scheme on Android, so a
-  // single value covers both platforms — Chrome Android, WeChat browser,
-  // Safari iOS all handle e.g. `weixin://` by prompting "Open in WeChat?".
-  // No public share-target deep link exists for these apps (they reserve
-  // that for OpenSDK partners), so we open the app at its home and rely on
-  // the clipboard for the actual content.
-  | { kind: "qr"; scheme: string }
+  | { kind: "qr" }
 );
 
 const ZH_PLATFORMS: ZhPlatform[] = [
-  { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr", scheme: "weixin://" },
-  // 朋友圈's app-icon mark is a multi-petal sunburst. Phosphor's `flower`
-  // (an 8-petal daisy) reads as Moments at menu size — closer than `sun`
-  // (rays of light), which the earlier pass used. Tinted Moments orange.
-  { key: "wechatMoments", icon: "flower", tint: "#FF9A1F", kind: "qr", scheme: "weixin://" },
-  { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr", scheme: "xhsdiscover://" },
+  { key: "wechat", icon: "wechat-logo", tint: "#07C160", kind: "qr" },
+  // 朋友圈's app-icon mark is a multi-petal sunburst — hand-drawn `flower`
+  // (eight petals around an empty center) reads as Moments at menu size,
+  // tinted Moments orange.
+  { key: "wechatMoments", icon: "flower", tint: "#FF9A1F", kind: "qr" },
+  { key: "xiaohongshu", icon: "xiaohongshu-logo", tint: "#FF2442", kind: "qr" },
   {
     key: "weibo",
     icon: "weibo-logo",
     tint: "#E6162D",
-    kind: "url",
-    // service.weibo.com IS a Weibo Universal Link — iOS routes installed-Weibo
-    // users into the app, everyone else gets the web share form. Same URL
-    // for PC + mobile.
     href: (u, t) =>
       `https://service.weibo.com/share/share.php?url=${enc(u)}&title=${enc(t)}`,
+    kind: "url",
   },
   {
     key: "qq",
     icon: "qq-logo",
     tint: "#12B7F5",
-    kind: "url",
-    // Tencent's connect.qq.com is the official cross-platform share endpoint;
-    // iOS/Android with QQ installed get the universal-link redirect into the
-    // app, others see the web form.
     href: (u, t) =>
       `https://connect.qq.com/widget/shareqq/index.html?url=${enc(u)}&title=${enc(t)}&desc=${enc(t)}`,
+    kind: "url",
   },
   {
     key: "qzone",
     icon: "qzone-logo",
     tint: "#FECE00",
-    kind: "url",
     href: (u, t) =>
       `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${enc(u)}&title=${enc(t)}&desc=${enc(t)}`,
+    kind: "url",
   },
 ];
 
-// Phone-shaped device check — used to split the QR-only platforms (WeChat /
-// Moments / Xiaohongshu) between desktop (QR modal) and mobile (copy +
-// scheme). Pure UA-test; we never need to know the exact OS, just whether
-// hand-off-to-app is plausible.
+// Phone-shaped device check — used only to decide whether to render the
+// six ZH platform rows (desktop only). Mobile ZH gets the copy-link row
+// and nothing else. The popover never renders during SSR so calling this
+// inside the render is safe (no hydration mismatch).
 function isMobileDevice(): boolean {
   if (typeof navigator === "undefined") return false;
   return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -183,40 +178,18 @@ export function ShareMenu({ locale }: { locale: Locale }) {
     setOpen(false);
   };
 
-  const onZhQrPlatform = async (key: ZhPlatformKey) => {
+  const onZhQrPlatform = (key: ZhPlatformKey) => {
     setOpen(false);
-    const platform = ZH_PLATFORMS.find((p) => p.key === key);
-    if (!platform || platform.kind !== "qr") return;
-
-    if (isMobileDevice()) {
-      // Mobile path — copy URL to clipboard, then hand off to the app via
-      // its URL scheme. The user pastes the URL into a chat / post once
-      // inside the app. Toast survives the navigation because <Toast/> is
-      // rendered into a portal at document.body that stays attached when
-      // the app-switching URL kicks in.
-      try {
-        await navigator.clipboard?.writeText(url);
-      } catch {
-        // Clipboard denied (older Android, secure-context issues). The
-        // toast still tells the user what to expect; they can long-press
-        // to copy from the address bar themselves.
-      }
-      showToast(dict.nav.linkCopiedPasteIn(dict.nav.sharePlatforms[key]));
-      // window.location triggers the scheme. iOS/modern Android intercept
-      // it and prompt "Open in WeChat / Xiaohongshu?". If the app isn't
-      // installed, the browser silently no-ops (or shows a generic error
-      // on iOS) — the clipboard + toast still give the user a path.
-      window.location.href = platform.scheme;
-      return;
-    }
-
-    // Desktop: QR modal so the user can scan with their phone.
     setQrFor(key);
   };
 
-  // Build the dropdown rows depending on locale. EN and ZH menus share the
-  // shell (button, popover, copy-link row, divider) but differ in body.
+  // Render-time decisions: which platform rows to show, and whether to draw
+  // the separator between Copy link and the platforms. ZH on mobile shows
+  // only Copy link, so the separator + platforms collapse away.
   const isZh = locale === "zh";
+  const showZhPlatforms = isZh && !isMobileDevice();
+  const showEnPlatforms = !isZh;
+  const showSeparator = showZhPlatforms || showEnPlatforms;
 
   return (
     <div ref={ref} className="relative">
@@ -235,7 +208,7 @@ export function ShareMenu({ locale }: { locale: Locale }) {
           role="menu"
           className="absolute top-11 z-50 w-44 right-0 min-[1440px]:left-0 min-[1440px]:right-auto overflow-hidden rounded-[var(--radius-md)] border border-border bg-card p-1.5 shadow-[var(--shadow-card)]"
         >
-          {/* Copy link — first row in both locales. */}
+          {/* Copy link — always present, first row. */}
           <button
             type="button"
             role="menuitem"
@@ -245,37 +218,11 @@ export function ShareMenu({ locale }: { locale: Locale }) {
             <Icon name="copy" size={17} />
             {dict.nav.copyLink}
           </button>
-          <div role="separator" className="my-1 border-t border-border" />
+          {showSeparator && <div role="separator" className="my-1 border-t border-border" />}
 
-          {isZh
-            ? ZH_PLATFORMS.map((p) =>
-                p.kind === "url" ? (
-                  <a
-                    key={p.key}
-                    role="menuitem"
-                    href={p.href(url, dict.site.tagline)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setOpen(false)}
-                    className="flex cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
-                  >
-                    <Icon name={p.icon} size={17} style={{ color: p.tint }} />
-                    {dict.nav.sharePlatforms[p.key]}
-                  </a>
-                ) : (
-                  <button
-                    key={p.key}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => onZhQrPlatform(p.key)}
-                    className="flex w-full cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-left text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
-                  >
-                    <Icon name={p.icon} size={17} style={{ color: p.tint }} />
-                    {dict.nav.sharePlatforms[p.key]}
-                  </button>
-                ),
-              )
-            : EN_PLATFORMS.map((p) => (
+          {showZhPlatforms &&
+            ZH_PLATFORMS.map((p) =>
+              p.kind === "url" ? (
                 <a
                   key={p.key}
                   role="menuitem"
@@ -285,10 +232,38 @@ export function ShareMenu({ locale }: { locale: Locale }) {
                   onClick={() => setOpen(false)}
                   className="flex cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
                 >
-                  <Icon name={p.icon} size={17} />
-                  {p.key}
+                  <Icon name={p.icon} size={17} style={{ color: p.tint }} />
+                  {dict.nav.sharePlatforms[p.key]}
                 </a>
-              ))}
+              ) : (
+                <button
+                  key={p.key}
+                  type="button"
+                  role="menuitem"
+                  onClick={() => onZhQrPlatform(p.key)}
+                  className="flex w-full cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-left text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
+                >
+                  <Icon name={p.icon} size={17} style={{ color: p.tint }} />
+                  {dict.nav.sharePlatforms[p.key]}
+                </button>
+              ),
+            )}
+
+          {showEnPlatforms &&
+            EN_PLATFORMS.map((p) => (
+              <a
+                key={p.key}
+                role="menuitem"
+                href={p.href(url, dict.site.tagline)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex cursor-pointer items-center gap-2.5 rounded-[8px] px-3 py-2 text-[13.5px] font-medium text-dim transition-colors hover:bg-grid-line hover:text-text"
+              >
+                <Icon name={p.icon} size={17} />
+                {p.key}
+              </a>
+            ))}
         </div>
       )}
       {qrFor && (
