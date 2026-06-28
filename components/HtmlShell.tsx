@@ -2,6 +2,8 @@ import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { ThemeInit } from "@/components/ThemeInit";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastHost } from "@/components/Toast";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { Analytics } from "@vercel/analytics/next";
 
 // Shared <html>/<body> chrome used by the two locale root layouts
 // (app/(en)/layout.tsx and app/(zh)/layout.tsx). Lifting the chrome out of
@@ -66,6 +68,11 @@ export function HtmlShell({
           }}
         />
         <ThemeInit />
+        {/* GA4 loads afterInteractive so it never blocks first paint. */}
+        <GoogleAnalytics />
+        {/* Vercel Web Analytics: mode defaults to 'auto', so it only reports
+            on production deployments — no dev/local noise. */}
+        <Analytics />
       </head>
       <body className="min-h-full antialiased">
         <SmoothScroll />
