@@ -4,6 +4,7 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastHost } from "@/components/Toast";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Shared <html>/<body> chrome used by the two locale root layouts
 // (app/(en)/layout.tsx and app/(zh)/layout.tsx). Lifting the chrome out of
@@ -73,6 +74,9 @@ export function HtmlShell({
         {/* Vercel Web Analytics: mode defaults to 'auto', so it only reports
             on production deployments — no dev/local noise. */}
         <Analytics />
+        {/* Vercel Speed Insights: reports Core Web Vitals from real visits on
+            production deployments only — no dev/local noise. */}
+        <SpeedInsights />
       </head>
       <body className="min-h-full antialiased">
         <SmoothScroll />
