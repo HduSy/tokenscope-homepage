@@ -42,6 +42,9 @@ export function buildPageMetadata(locale: Locale): Metadata {
       "Claude usage tracker",
       "ccusage alternative",
       "macOS menu bar",
+      "Windows system tray",
+      "macOS",
+      "Windows",
       "AI cost",
       "MCP",
       "Skills",
@@ -100,7 +103,7 @@ export function buildJsonLd(locale: Locale) {
     url: locale === "zh" ? `${SITE_URL}/zh` : SITE_URL,
     applicationCategory: "DeveloperApplication",
     applicationSubCategory: "Developer Tools",
-    operatingSystem: "macOS",
+    operatingSystem: "macOS, Windows",
     license: "https://opensource.org/licenses/MIT",
     downloadUrl: "https://github.com/HduSy/tokenscope/releases",
     offers: {

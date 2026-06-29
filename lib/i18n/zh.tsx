@@ -17,19 +17,19 @@ const linkBorder = {
 
 export const zh: Dict = {
   site: {
-    tagline: "Claude Code Token 费用，全在你的 macOS 菜单栏",
+    tagline: "Claude Code Token 费用，全在你的菜单栏",
     description:
-      "一款 macOS 菜单栏应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
+      "一款面向 macOS 与 Windows 的菜单栏 / 系统托盘应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
     ogDescription:
-      "随时查看你的 Claude Code 消耗了多少、花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的 macOS 菜单栏。",
-    ogAlt: "Tokenscope — Claude Code Token 费用，全在你的 macOS 菜单栏",
+      "随时查看你的 Claude Code 消耗了多少、花了多少钱。每日 Token 费用、按模型拆分、MCP 和 Skill 调用次数，全在你的菜单栏。",
+    ogAlt: "Tokenscope — Claude Code Token 费用，全在你的菜单栏",
   },
 
   jsonLd: {
     description:
-      "一款 macOS 菜单栏应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
+      "一款面向 macOS 与 Windows 的菜单栏 / 系统托盘应用，显示你的 Claude Code Token 费用：每日花销、按模型拆分、MCP 与 Skill 调用次数。只读，无需 API key。",
     features: [
-      "在 macOS 菜单栏中按日、周、月查看 Claude Code Token 费用",
+      "在菜单栏（macOS）或系统托盘（Windows）中按日、周、月查看 Claude Code Token 费用",
       "按四种 Token 类型（输入、缓存写入、缓存读取、输出）分别估算费用，价格来自 models.dev 与 LiteLLM",
       "按模型拆分的 Token 与费用明细",
       "MCP 服务与 Skill 调用次数统计",
@@ -68,7 +68,7 @@ export const zh: Dict = {
   },
 
   hero: {
-    pill: "适用于 Claude Code 的 macOS 菜单栏小工具",
+    pill: "适用于 Claude Code 的菜单栏小工具",
     h1Lead: "随时查看你的 Claude Code",
     h1Accent: "消耗了多少 Token，花了多少钱。",
     sub: "一个常驻菜单栏的 dashboard，以模型维度统计每日/周/月 Token 消耗量与费用，以及 MCP 与 Skill 调用次数。只读，零侵入。",
@@ -82,7 +82,7 @@ export const zh: Dict = {
   pipeline: {
     h2: "只读、不上传数据，也不需要 API key。",
     intro:
-      "Tokenscope 直接读取 Claude Code 写到磁盘中的 JSONL 请求日志文件。不上传，不需要 API key，也不调用 Anthropic 接口，所有数据都留在你的 Mac 上。不存在安全隐私问题，也不追踪分析使用数据。",
+      "Tokenscope 直接读取 Claude Code 写到磁盘中的 JSONL 请求日志文件。不上传，不需要 API key，也不调用 Anthropic 接口，所有数据都留在你的电脑上。不存在安全隐私问题，也不追踪分析使用数据。",
     steps: {
       read: {
         title: "读取",
@@ -212,14 +212,20 @@ export const zh: Dict = {
   },
 
   install: {
-    h2: "一行 Homebrew 命令即可安装。",
+    h2: "在 macOS 或 Windows 上安装。",
     intro:
-      "Homebrew 会替你清除隔离标记，打开即用。之后每次开机都会自动运行在菜单栏中。",
+      "在 macOS 上，一行 Homebrew 命令会替你清除隔离标记，打开即用；在 Windows 上，下载安装包运行即可。无论哪种方式，之后每次开机都会自动运行在菜单栏中。",
+    macLabel: "macOS",
+    winLabel: "Windows",
     copyBtn: "复制",
     toastCopied: "已复制安装命令",
     toastFallback: "请手动选中并复制",
+    winDownload: {
+      btn: "下载 .exe (x64)",
+      note: "未签名构建——首次启动时点击「更多信息 → 仍要运行」即可绕过 SmartScreen。",
+    },
     directDownload: {
-      lead: "想直接下载？去 GitHub Releases 下载通用版",
+      lead: "在 macOS 上想直接下载？去 GitHub Releases 下载通用版",
       linkText: ".dmg",
       tail: (
         <>
@@ -271,17 +277,17 @@ export const zh: Dict = {
         ),
       },
       {
-        q: "为什么 .dmg 会提示来自未认证的开发者？",
+        q: "为什么会提示来自未认证的开发者 / 未知发布者？",
         aPlain:
-          "这个 cask 还没通过 Apple Developer 计划公证。Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用。如果是直接下载 .dmg，第一次右键点击选择打开，或者运行一次 xattr -cr /Applications/Tokenscope.app 再打开。",
+          "Tokenscope 还没通过 Apple Developer 或 Windows 发布者计划的代码签名。在 macOS 上，Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用；如果是直接下载 .dmg，第一次右键点击选择打开，或者运行一次 xattr -cr /Applications/Tokenscope.app 再打开。在 Windows 上，.exe 安装包未签名，首次启动时点击「更多信息 → 仍要运行」即可绕过 SmartScreen。",
         a: (
           <>
-            这个 cask 还没通过 Apple Developer 计划公证。Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用。如果是直接下载{" "}
+            Tokenscope 还没通过 Apple Developer 或 Windows 发布者计划的代码签名。在 macOS 上，Homebrew 会替你清除隔离标记，所以 brew 安装完即可使用；如果是直接下载{" "}
             <code className={code}>.dmg</code>，第一次右键 → 打开，或者运行一次{" "}
             <code className={code}>
               xattr -cr /Applications/Tokenscope.app
             </code>{" "}
-            再打开。
+            再打开。在 Windows 上，<code className={code}>.exe</code> 安装包未签名，首次启动时点击「更多信息 → 仍要运行」即可绕过 SmartScreen。
           </>
         ),
       },
@@ -359,12 +365,12 @@ export const zh: Dict = {
         ),
       },
       {
-        q: "会不会拖慢我的 Mac？",
+        q: "会不会拖慢我的电脑？",
         aPlain:
-          "不会。菜单栏进程只监听项目目录的文件变化，仅重新解析 mtime 有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。",
+          "不会。后台进程只监听项目目录的文件变化，仅重新解析 mtime 有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。",
         a: (
           <>
-            菜单栏进程监听项目目录的文件变化，仅重新解析{" "}
+            后台进程监听项目目录的文件变化，仅重新解析{" "}
             <code className={code}>mtime</code>{" "}
             有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。
           </>
@@ -435,7 +441,7 @@ export const zh: Dict = {
   },
 
   footer: {
-    caption: "在 macOS 菜单栏中追踪你的 Claude Code Token 费用。",
+    caption: "在菜单栏中追踪你的 Claude Code Token 费用。",
     columns: {
       product: "产品",
       resources: "资源",
@@ -451,7 +457,8 @@ export const zh: Dict = {
       modelsDev: "models.dev",
       bugLog: "Bug 日志",
       homebrew: "Homebrew",
-      dmg: ".dmg 下载",
+      dmg: ".dmg (macOS)",
+      exe: ".exe (Windows)",
     },
     copyright: "© 2026 HduSy · MIT License",
     builtWith: "Tauri · Rust + React 构建",

@@ -28,20 +28,20 @@ export type FaqItem = { q: string; aPlain: string; a: ReactNode };
 export const en = {
   // ── Site-wide copy referenced from app/layout.tsx, sitemap, OG, etc. ─
   site: {
-    tagline: "Claude Code token cost, in your macOS menu bar",
+    tagline: "Claude Code token cost, in your menu bar",
     description:
-      "A macOS menu-bar app that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.",
+      "A menu-bar and system-tray app for macOS and Windows that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.",
     ogDescription:
-      "See what your Claude Code consumes and spends. Daily token cost, per-model breakdown, MCP and Skill call counts in your macOS menu bar.",
-    ogAlt: "Tokenscope — Claude Code token cost, in your macOS menu bar",
+      "See what your Claude Code consumes and spends. Daily token cost, per-model breakdown, MCP and Skill call counts in your menu bar.",
+    ogAlt: "Tokenscope — Claude Code token cost, in your menu bar",
   },
 
   // ── JSON-LD payload — mirrors SoftwareApplication.description + featureList ─
   jsonLd: {
     description:
-      "A macOS menu-bar app that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.",
+      "A menu-bar and system-tray app for macOS and Windows that shows your Claude Code token cost: daily spend, per-model breakdown, MCP and Skill call counts. Read-only, no API key.",
     features: [
-      "Daily, weekly, and monthly Claude Code token cost in the macOS menu bar",
+      "Daily, weekly, and monthly Claude Code token cost in your menu bar (macOS) or system tray (Windows)",
       "Estimated cost priced per token type (input, cache write, cache read, output) from models.dev and LiteLLM rates",
       "Per-model token and cost breakdown",
       "MCP-server and Skill call counts",
@@ -84,7 +84,7 @@ export const en = {
 
   // ── Hero (top of page) ─
   hero: {
-    pill: "macOS menu-bar app for Claude Code",
+    pill: "Menu-bar app for Claude Code",
     h1Lead: "See what your Claude Code",
     h1Accent: "consumes and spends.",
     sub: "A menu-bar dashboard tracking token usage and cost by model — daily, weekly, monthly — plus MCP and Skill call counts. Read-only, zero intrusion.",
@@ -100,7 +100,7 @@ export const en = {
   pipeline: {
     h2: "Read-only by design — no telemetry, no API key.",
     intro:
-      "Tokenscope reads the JSONL request logs your Claude Code already writes to disk. No uploads. No API keys. No calls to Anthropic. Nothing leaves your Mac. No security or privacy concerns, and no usage data is ever tracked or analyzed.",
+      "Tokenscope reads the JSONL request logs your Claude Code already writes to disk. No uploads. No API keys. No calls to Anthropic. Nothing leaves your computer. No security or privacy concerns, and no usage data is ever tracked or analyzed.",
     steps: {
       read: {
         title: "Read",
@@ -237,14 +237,20 @@ export const en = {
 
   // ── Install section ─
   install: {
-    h2: "Install in one line of Homebrew.",
+    h2: "Install on macOS or Windows.",
     intro:
-      "Homebrew clears the quarantine flag for you, so it's ready to use right away. After that it runs in your menu bar on every boot.",
+      "On macOS, one line of Homebrew clears the quarantine flag for you, so it's ready to use right away. On Windows, download the installer and run it. Either way, it starts in your menu bar on every boot.",
+    macLabel: "macOS",
+    winLabel: "Windows",
     copyBtn: "Copy",
     toastCopied: "Copied brew install",
     toastFallback: "Select and copy",
+    winDownload: {
+      btn: "Download .exe (x64)",
+      note: "Unsigned build — on first launch click More info → Run anyway to clear SmartScreen.",
+    },
     directDownload: {
-      lead: "Prefer a direct download? Grab the universal",
+      lead: "Prefer a direct download on macOS? Grab the universal",
       linkText: ".dmg from GitHub Releases",
       tail: (
         <>
@@ -298,20 +304,22 @@ export const en = {
         ),
       },
       {
-        q: "Why does the .dmg warn about an unidentified developer?",
+        q: "Why does it warn about an unidentified developer or unknown publisher?",
         aPlain:
-          "The cask is not notarized through the Apple Developer program yet. Homebrew clears the quarantine flag for you, so the brew install is ready to use right away. For a direct .dmg download, right-click and choose Open the first time, or run xattr -cr /Applications/Tokenscope.app and then open it.",
+          "Tokenscope isn't code-signed through the Apple Developer or Windows publisher programs yet. On macOS, Homebrew clears the quarantine flag for you, so the brew install is ready to use right away; for a direct .dmg download, right-click and choose Open the first time, or run xattr -cr /Applications/Tokenscope.app and then open it. On Windows, the .exe installer is unsigned, so on first launch click More info → Run anyway to clear SmartScreen.",
         a: (
           <>
-            The cask isn&apos;t notarized through the Apple Developer program
-            yet. Homebrew clears the quarantine flag for you, so the brew route
-            is ready to use right away. For a direct{" "}
-            <code className={code}>.dmg</code> download, right-click → Open the
-            first time, or run{" "}
+            Tokenscope isn&apos;t code-signed through the Apple Developer or
+            Windows publisher programs yet. On macOS, Homebrew clears the
+            quarantine flag for you, so the brew route is ready to use right
+            away. For a direct <code className={code}>.dmg</code> download,
+            right-click → Open the first time, or run{" "}
             <code className={code}>
               xattr -cr /Applications/Tokenscope.app
             </code>{" "}
-            and then open it.
+            and then open it. On Windows, the{" "}
+            <code className={code}>.exe</code> installer is unsigned, so on
+            first launch click More info → Run anyway to clear SmartScreen.
           </>
         ),
       },
@@ -397,12 +405,12 @@ export const en = {
         ),
       },
       {
-        q: "Will it slow down my Mac?",
+        q: "Will it slow down my computer?",
         aPlain:
-          "No. The menu-bar process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory holds steady around 40MB. Refreshing the panel is just a single pass over the new JSONL bytes since the last read. Performance is excellent.",
+          "No. The background process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory holds steady around 40MB. Refreshing the panel is just a single pass over the new JSONL bytes since the last read. Performance is excellent.",
         a: (
           <>
-            The menu-bar process watches the projects directory for file
+            The background process watches the projects directory for file
             changes and only re-parses files whose{" "}
             <code className={code}>mtime</code> moved. Idle CPU is essentially
             zero; memory holds steady around 40MB. Refreshing the panel is just
@@ -483,7 +491,7 @@ export const en = {
 
   // ── Footer ─
   footer: {
-    caption: "Track your Claude Code token cost, in the macOS menu bar.",
+    caption: "Track your Claude Code token cost, in the menu bar.",
     columns: {
       product: "Product",
       resources: "Resources",
@@ -499,7 +507,8 @@ export const en = {
       modelsDev: "models.dev",
       bugLog: "Bug log",
       homebrew: "Homebrew",
-      dmg: ".dmg download",
+      dmg: ".dmg (macOS)",
+      exe: ".exe (Windows)",
     },
     copyright: "© 2026 HduSy · MIT License",
     builtWith: "Built with Tauri · Rust + React",

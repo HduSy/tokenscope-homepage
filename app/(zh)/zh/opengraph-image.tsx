@@ -8,9 +8,9 @@ import { renderOgImage, OG_SIZE, OG_CONTENT_TYPE, loadGoogleFont } from "@/lib/o
 
 const HEADLINE_1 = "看清你的 Claude Code";
 const HEADLINE_2 = "到底花了多少钱。";
-const TAGLINE = "Claude Code Token 费用，全在你的 macOS 菜单栏。";
+const TAGLINE = "Claude Code Token 费用，全在你的菜单栏。";
 
-export const alt = "Tokenscope — Claude Code Token 费用，全在你的 macOS 菜单栏";
+export const alt = "Tokenscope — Claude Code Token 费用，全在你的菜单栏";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

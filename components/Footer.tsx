@@ -41,6 +41,7 @@ const COLS: Col[] = [
     links: [
       { href: "#install", labelKey: "homebrew" },
       { href: "https://github.com/HduSy/tokenscope/releases", labelKey: "dmg", external: true },
+      { href: "https://github.com/HduSy/tokenscope/releases", labelKey: "exe", external: true },
     ],
   },
 ];
