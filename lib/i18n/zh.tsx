@@ -432,6 +432,14 @@ export const zh: Dict = {
       "Tokenscope 的「按模型看 Token / 费用」一眼就能对比出不同模型有多贵。同样的用量，GLM-5.2 大概只要 Claude-Opus-4-8 的七分之一。",
       "Tokenscope 同时给你日、周、月三种维度的拆分，周和月的视图还能让你看清自己使用 AI 的习惯和规律，挺有意思的。再加上一个 GitHub 风格的 commit 热力图，能完整看到自己在 AI 上投了多少时间。",
       "Tokenscope 的截图功能也很方便 —— 一键就能分享到社交平台，大家可以一起对比一下，晒晒「成绩单」。",
+      // Different author — overrides name/role/avatar/link for this card only.
+      {
+        quote: "这个确实挺好看。",
+        name: "dingyi",
+        role: "Independent designer & developer.",
+        avatar: "/avatars/dingyi.jpg",
+        link: "https://x.com/dingyi/status/2072454710909624813",
+      },
     ],
   },
 

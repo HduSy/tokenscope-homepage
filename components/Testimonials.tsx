@@ -11,7 +11,19 @@ import { getDict, type Locale } from "@/lib/i18n";
 // to max-w-[1200px]: it's a distinct layout family from the boxed sections
 // above and below it, so the page rhythm doesn't repeat.
 
-type Review = { name: string; role?: string; avatar?: string; quote: string };
+type Review = { name: string; role?: string; avatar?: string; quote: string; link: string };
+
+// A quote entry is normally just the quote text (string) — it inherits the
+// default author (@alifeiliu), role, avatar, and profile link. An object
+// entry overrides any of those per-card, used when a review comes from a
+// different person or points at a specific tweet.
+type QuoteEntry = string | {
+  quote: string;
+  name?: string;
+  role?: string;
+  avatar?: string;
+  link?: string;
+};
 
 // Real user reviews. @alifeiliu shared separate takes on the tool - each one
 // becomes its own card, all under the same handle, role, and avatar.
@@ -23,6 +35,7 @@ const AUTHOR_NAME = "alifeiliu";
 // display). Local serving also drops the cross-origin DNS lookup + the
 // referrer-policy dance that twimg.com requires.
 const AUTHOR_AVATAR = "/avatars/alifeiliu.jpg";
+const AUTHOR_LINK = "https://x.com/alifeiliu";
 
 function initials(name: string) {
   return name
@@ -113,11 +126,12 @@ function Card({ r }: { r: Review }) {
 
 export function Testimonials({ locale }: { locale: Locale }) {
   const t = getDict(locale);
-  const REVIEWS: Review[] = t.testimonials.quotes.map((q) => ({
+  const REVIEWS: Review[] = t.testimonials.quotes.map((q: QuoteEntry) => ({
     name: AUTHOR_NAME,
     role: t.testimonials.role,
     avatar: AUTHOR_AVATAR,
-    quote: q,
+    link: AUTHOR_LINK,
+    ...(typeof q === "string" ? { quote: q } : q),
   }));
   // Duplicate the set so the track can translate -50% for a seamless loop.
   const loop = [...REVIEWS, ...REVIEWS];
@@ -136,7 +150,13 @@ export function Testimonials({ locale }: { locale: Locale }) {
       </div>
 
       <div className="marquee">
-        <div className="marquee-track">
+        <div
+          className="marquee-track"
+          // Per-locale card count → CSS var drives a count-proportional
+          // animation duration in globals.css, so locales with different
+          // review counts scroll at the same visual speed.
+          style={{ "--marquee-count": REVIEWS.length } as React.CSSProperties}
+        >
           {loop.map((r, i) => {
             // Chinese aria is "在 X 上查看 @name", English is "View @name on X".
             // Join with single spaces and trim any empty suffix.
@@ -144,7 +164,7 @@ export function Testimonials({ locale }: { locale: Locale }) {
             return (
               <a
                 key={i}
-                href={`https://x.com/${r.name}`}
+                href={r.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={aria}

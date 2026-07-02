@@ -269,7 +269,10 @@ html.js .heat-anim:not(.in) {
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee 64s linear infinite;
+  /* Duration scales with card count (set per-locale as --marquee-count on the
+     track element) so the visual scroll speed stays constant whether a locale
+     has 6 or 7 cards. 10.667s ≈ the original 64s / 6 cards baseline. */
+  animation: marquee calc(var(--marquee-count, 6) * 10.667s) linear infinite;
 }
 .marquee:hover .marquee-track {
   animation-play-state: paused;

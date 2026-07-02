@@ -25,6 +25,35 @@ const linkBorder = {
 
 export type FaqItem = { q: string; aPlain: string; a: ReactNode };
 
+// A quote entry is normally just the quote text (string) — it inherits the
+// default author, role, avatar, and profile link from Testimonials. An object
+// entry overrides any of those per-card, used when a review comes from a
+// different person or points at a specific tweet. Exported so the zh dict
+// (typed as `Dict = typeof en`) accepts the same shape on both sides.
+export type QuoteEntry =
+  | string
+  | {
+      quote: string;
+      name?: string;
+      role?: string;
+      avatar?: string;
+      link?: string;
+    };
+
+// Testimonial quotes for the marquee. Declared with an explicit QuoteEntry[]
+// annotation (rather than relying on `satisfies` / literal inference) so that
+// `Dict = typeof en` types testimonials.quotes as QuoteEntry[] — which lets
+// the zh dict place object entries (per-card author overrides) alongside
+// plain string entries without a type error.
+const TESTIMONIAL_QUOTES: QuoteEntry[] = [
+  "Genuinely fun to use - every time your usage ticks past another 100M tokens, Tokenscope sets off this little fireworks animation 🎉. Weirdly satisfying, and it actually makes you feel like you've accomplished something.",
+  "The token count is spot-on. I ran Tokenscope against GLM-5.2 for a while and cross-checked with the Coding-Plan dashboard - the two lined right up. The dollar figure is an estimate, of course.",
+  "One thing Tokenscope is great for: seeing how many tokens you actually get out of the various Coding-Plan and subscription tiers within a refresh window. Zhipu Lite's 5h Coding-Plan comes to about 20M; ByteDance Volcano Ark's Pro 5h plan, roughly 70M.",
+  "Tokenscope's Tokens/Cost by Model view makes it dead easy to compare how pricey different models are. Same token usage, GLM-5.2 runs about a seventh of what Claude-Opus-4-8 costs.",
+  "Tokenscope gives you daily, weekly, and monthly breakdowns - the weekly and monthly views even reveal your own AI-usage habits and patterns, which is pretty cool. Plus there's a GitHub-style commit heatmap that shows the full picture of how much you've poured into AI.",
+  "Tokenscope's screenshot feature is really handy too - easy to share straight to your socials, so everyone can compare notes and show off their 'report cards'.",
+];
+
 export const en = {
   // ── Site-wide copy referenced from app/layout.tsx, sitemap, OG, etc. ─
   site: {
@@ -473,14 +502,7 @@ export const en = {
     role: "Full-stack (Frontend) Engineer",
     ariaPrefix: "View",
     ariaSuffix: "on X",
-    quotes: [
-      "Genuinely fun to use - every time your usage ticks past another 100M tokens, Tokenscope sets off this little fireworks animation 🎉. Weirdly satisfying, and it actually makes you feel like you've accomplished something.",
-      "The token count is spot-on. I ran Tokenscope against GLM-5.2 for a while and cross-checked with the Coding-Plan dashboard - the two lined right up. The dollar figure is an estimate, of course.",
-      "One thing Tokenscope is great for: seeing how many tokens you actually get out of the various Coding-Plan and subscription tiers within a refresh window. Zhipu Lite's 5h Coding-Plan comes to about 20M; ByteDance Volcano Ark's Pro 5h plan, roughly 70M.",
-      "Tokenscope's Tokens/Cost by Model view makes it dead easy to compare how pricey different models are. Same token usage, GLM-5.2 runs about a seventh of what Claude-Opus-4-8 costs.",
-      "Tokenscope gives you daily, weekly, and monthly breakdowns - the weekly and monthly views even reveal your own AI-usage habits and patterns, which is pretty cool. Plus there's a GitHub-style commit heatmap that shows the full picture of how much you've poured into AI.",
-      "Tokenscope's screenshot feature is really handy too - easy to share straight to your socials, so everyone can compare notes and show off their 'report cards'.",
-    ],
+    quotes: TESTIMONIAL_QUOTES,
   },
 
   // ── Final CTA card ─
