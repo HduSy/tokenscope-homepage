@@ -440,6 +440,13 @@ export const zh: Dict = {
         avatar: "/avatars/dingyi.jpg",
         link: "https://x.com/dingyi/status/2072454710909624813",
       },
+      {
+        quote: "这个真的比自己写小玩意的好看太多了😂",
+        name: "haogre",
+        role: "An engineer aspiring to be a designer.",
+        avatar: "/avatars/haogre.jpg",
+        link: "https://x.com/haogre/status/2072511887431147738",
+      },
     ],
   },
 
