@@ -428,10 +428,6 @@ export const zh: Dict = {
     quotes: [
       "用起来挺有意思 —— 每次用量越过下一个 1 亿 Token，Tokenscope 都会放一个小烟花动画 🎉。莫名有点上瘾，确实让你觉得自己干了点儿什么。",
       "Token 数字非常准。我对着 GLM-5.2 跑了一段时间，把 Tokenscope 和 Coding-Plan 后台对了一下，两个数字完全对得上。当然，金额是估算的。",
-      "Tokenscope 有个很实用的场景：看清在一个刷新周期内，各家 Coding-Plan 和订阅档位实际能用到多少 Token。智谱 Lite 的 5h Coding-Plan 大概 2000 万；字节火山方舟 Pro 5h 大概 7000 万。",
-      "Tokenscope 的「按模型看 Token / 费用」一眼就能对比出不同模型有多贵。同样的用量，GLM-5.2 大概只要 Claude-Opus-4-8 的七分之一。",
-      "Tokenscope 同时给你日、周、月三种维度的拆分，周和月的视图还能让你看清自己使用 AI 的习惯和规律，挺有意思的。再加上一个 GitHub 风格的 commit 热力图，能完整看到自己在 AI 上投了多少时间。",
-      "Tokenscope 的截图功能也很方便 —— 一键就能分享到社交平台，大家可以一起对比一下，晒晒「成绩单」。",
       // Different author — overrides name/role/avatar/link for this card only.
       {
         quote: "这个确实挺好看。",
@@ -440,6 +436,8 @@ export const zh: Dict = {
         avatar: "/avatars/dingyi.jpg",
         link: "https://x.com/dingyi/status/2072454710909624813",
       },
+      "Tokenscope 有个很实用的场景：看清在一个刷新周期内，各家 Coding-Plan 和订阅档位实际能用到多少 Token。智谱 Lite 的 5h Coding-Plan 大概 2000 万；字节火山方舟 Pro 5h 大概 7000 万。",
+      "Tokenscope 的「按模型看 Token / 费用」一眼就能对比出不同模型有多贵。同样的用量，GLM-5.2 大概只要 Claude-Opus-4-8 的七分之一。",
       {
         quote: "这个真的比自己写小玩意的好看太多了😂",
         name: "haogre",
@@ -447,6 +445,8 @@ export const zh: Dict = {
         avatar: "/avatars/haogre.jpg",
         link: "https://x.com/haogre/status/2072511887431147738",
       },
+      "Tokenscope 同时给你日、周、月三种维度的拆分，周和月的视图还能让你看清自己使用 AI 的习惯和规律，挺有意思的。再加上一个 GitHub 风格的 commit 热力图，能完整看到自己在 AI 上投了多少时间。",
+      "Tokenscope 的截图功能也很方便 —— 一键就能分享到社交平台，大家可以一起对比一下，晒晒「成绩单」。",
     ],
   },
 
