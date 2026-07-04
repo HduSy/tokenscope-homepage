@@ -76,60 +76,92 @@ export function buildPageMetadata(locale: Locale): Metadata {
   };
 }
 
-// JSON-LD payloads for the SoftwareApplication card and the FAQ mirror. Each
-// page emits its locale's pair inline in <head>. The FAQ array is derived
-// from the same dict the visible Faq.tsx reads — single source of truth.
+// JSON-LD graph emitted inline in <head> as a single <script> (PageShell).
+// Four nodes connected by @id so search engines resolve them as one entity
+// graph rather than four detached blobs:
+//
+//   Organization         brand identity (logo + sameAs → Knowledge Panel).
+//   WebSite              the site entity, published by the Organization.
+//   SoftwareApplication  the product; author = HduSy (Person, accurate),
+//                        publisher = Organization (entity linkage), free Offer.
+//   FAQPage              locale-specific Q&A, derived from the same dict the
+//                        visible Faq.tsx reads (single source of truth).
+//
+// Each locale route emits its own graph with its own inLanguage / url, so
+// /zh carries Chinese Q&A and / carries English; Organization is identical on
+// both. public/logo.png (512×512) backs Organization.logo and
+// SoftwareApplication.image — Google wants a ≥112×112 raster for the SERP
+// mark, and a stable URL (the OG image route carries a per-build hash, so it
+// is deliberately not used here).
 
 export function buildJsonLd(locale: Locale) {
   const dict = getDict(locale);
-  // Organization node — Google reads `logo` (a ≥112×112 raster image) to
-  // render the square brand mark in search results, the Knowledge Panel, and
-  // Discover. public/logo.png is the 512×512 rasterized brand mark. `sameAs`
-  // wires the canonical social profile. This is locale-independent so both
-  // routes emit the same Organization identity.
-  const organization = {
+  const isZh = locale === "zh";
+  const inLanguage = isZh ? "zh-CN" : "en";
+  // Canonical per-locale URL — matches the <link rel="canonical"> form (and
+  // the sitemap <loc> entries) so @id fragments land on the URL Google
+  // already treats as canonical.
+  const pageUrl = isZh ? `${SITE_URL}/zh` : `${SITE_URL}/`;
+  const orgId = `${SITE_URL}/#org`;
+
+  return {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: SITE_NAME,
-    url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
-    sameAs: ["https://github.com/HduSy/tokenscope"],
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": orgId,
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: `${SITE_URL}/logo.png`,
+        sameAs: ["https://github.com/HduSy/tokenscope"],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${pageUrl}#website`,
+        name: SITE_NAME,
+        url: pageUrl,
+        inLanguage,
+        publisher: { "@id": orgId },
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${pageUrl}#app`,
+        name: SITE_NAME,
+        description: dict.jsonLd.description,
+        url: pageUrl,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "macOS, Windows",
+        license: "https://opensource.org/licenses/MIT",
+        downloadUrl: "https://github.com/HduSy/tokenscope/releases",
+        image: `${SITE_URL}/logo.png`,
+        isAccessibleForFree: true,
+        inLanguage,
+        featureList: dict.jsonLd.features,
+        programmingLanguage: ["Rust", "TypeScript", "React"],
+        codeRepository: "https://github.com/HduSy/tokenscope",
+        author: {
+          "@type": "Person",
+          name: "HduSy",
+          url: "https://github.com/HduSy",
+        },
+        publisher: { "@id": orgId },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+        },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${pageUrl}#faq`,
+        inLanguage,
+        mainEntity: dict.faq.items.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.aPlain },
+        })),
+      },
+    ],
   };
-  const software = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: SITE_NAME,
-    description: dict.jsonLd.description,
-    url: locale === "zh" ? `${SITE_URL}/zh` : SITE_URL,
-    applicationCategory: "DeveloperApplication",
-    applicationSubCategory: "Developer Tools",
-    operatingSystem: "macOS, Windows",
-    license: "https://opensource.org/licenses/MIT",
-    downloadUrl: "https://github.com/HduSy/tokenscope/releases",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    author: {
-      "@type": "Person",
-      name: "HduSy",
-      url: "https://github.com/HduSy",
-    },
-    codeRepository: "https://github.com/HduSy/tokenscope",
-    inLanguage: locale === "zh" ? "zh-CN" : "en",
-    featureList: dict.jsonLd.features,
-    programmingLanguage: ["Rust", "TypeScript", "React"],
-  };
-  const faq = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    inLanguage: locale === "zh" ? "zh-CN" : "en",
-    mainEntity: dict.faq.items.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.aPlain },
-    })),
-  };
-  return { organization, software, faq };
 }

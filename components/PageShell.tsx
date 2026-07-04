@@ -24,20 +24,19 @@ import { getDict, type Locale } from "@/lib/i18n";
 // extractor has an explicit landmark to anchor on.
 
 export function PageShell({ locale }: { locale: Locale }) {
-  const { organization, software, faq } = buildJsonLd(locale);
+  const jsonLdGraph = buildJsonLd(locale);
   const t = getDict(locale);
   return (
     <>
-      {/* JSON-LD: Organization (brand identity + SERP logo), SoftwareApplication,
-          and FAQPage. SoftwareApplication + FAQ are locale-aware; Organization
-          is identical on both routes. */}
-      {[organization, software, faq].map((data, i) => (
-        <script
-          key={i}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-        />
-      ))}
+      {/* JSON-LD: a single @graph connecting Organization, WebSite,
+          SoftwareApplication, and FAQPage by @id. SoftwareApplication and
+          FAQPage are locale-aware (Chinese on /zh, English on /); the rest
+          is shared. Emitted as one script so the @id references resolve
+          within the same graph. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
       {/* Skip link — first focusable element in the document. Hidden until
           a keyboard user tabs onto it, then absolutely positioned in the
           top-left as a clearly-styled chip. */}
