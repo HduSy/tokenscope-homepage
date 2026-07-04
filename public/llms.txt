@@ -1,21 +1,56 @@
 # Tokenscope
 
-> A free, open-source macOS menu-bar app that shows Claude Code token cost, per-model breakdown, and MCP and Skill call counts, by reading the JSONL logs Claude Code already writes locally. No API key, no telemetry, MIT licensed.
+> A free, open-source macOS menu-bar and Windows system-tray app that shows Claude Code token cost — daily spend, per-model breakdown, and MCP and Skill call counts — by reading the JSONL logs Claude Code already writes locally. No API key, no telemetry, MIT licensed.
 
-Tokenscope is a read-only macOS menu-bar app for developers using Anthropic's Claude Code (formerly known as Claude CLI). It parses the usage logs under ~/.claude/projects/, prices each request against per-million-token rates from models.dev (with a LiteLLM fallback and a built-in snapshot when offline), and surfaces total tokens, estimated cost, daily, weekly, and monthly trends, per-model cost, MCP-server and Skill call counts, and a GitHub-style daily activity heatmap. It sends nothing over the network and needs no account or API key.
+Tokenscope is a read-only app for developers using Anthropic's Claude Code (formerly Claude CLI). On macOS it lives in the menu bar; on Windows it lives in the system tray. It parses the usage logs under ~/.claude/projects/, prices each request against per-million-token rates from models.dev (with a LiteLLM fallback and a built-in snapshot when offline), and surfaces total tokens, estimated cost, daily, weekly, and monthly trends, per-model cost, MCP-server and Skill call counts, and a GitHub-style daily activity heatmap. It sends nothing over the network and needs no account or API key.
 
 ## Key facts
 
-- Price: Free. MIT licensed, no paid tier, no telemetry.
-- Platform: macOS, running in the menu bar.
-- Install: `brew install --cask hdusy/tokenscope/tokenscope` via Homebrew, or the `.dmg` from GitHub Releases.
+- Price: Free. MIT licensed, no paid tier, no telemetry. (Machine-readable pricing: /pricing.md)
+- Platforms: macOS (menu bar) and Windows (system tray).
+- Install — macOS: `brew install --cask hdusy/tokenscope/tokenscope` via Homebrew, or the `.dmg` from GitHub Releases.
+- Install — Windows: download the `.exe` (x64) installer from GitHub Releases. Unsigned build — on first launch click "More info → Run anyway" to clear SmartScreen.
 - Privacy: reads local JSONL logs only. No network calls, no account, no API key.
-- Source code: https://github.com/HduSy/tokenscope
+- Cost accuracy: tokens are priced per type (input, cache write, cache read, output) using rates from models.dev and LiteLLM, which track Anthropic's published pricing (https://www.anthropic.com/pricing). Estimates only — your actual provider bill is authoritative.
+- Source code: https://github.com/HduSy/tokenscope (Rust + React, built with Tauri, MIT licensed).
 
 ## Links
 
-- [Tokenscope homepage](https://tokenscope.app/): what it does, how cost is calculated, and install steps.
-- [How Claude Code token cost is calculated](https://tokenscope.app/#pricing): each token count multiplied by its per-million rate, then summed.
-- [Frequently asked questions](https://tokenscope.app/#faq): privacy, cost accuracy, performance, and supported tools.
-- [GitHub repository](https://github.com/HduSy/tokenscope): source, issues, and documentation.
-- [Releases](https://github.com/HduSy/tokenscope/releases): downloadable `.dmg` builds.
+- Tokenscope homepage (English): https://tokenscope.app/
+- Tokenscope homepage (中文): https://tokenscope.app/zh
+- How Claude Code token cost is calculated: https://tokenscope.app/#pricing
+- Frequently asked questions: https://tokenscope.app/#faq
+- GitHub repository: https://github.com/HduSy/tokenscope
+- Releases (`.dmg` and `.exe` builds): https://github.com/HduSy/tokenscope/releases
+
+## FAQ
+
+These mirror the on-page FAQ, in plain text so the answers are directly citable.
+
+### Does Tokenscope send any of my data over the network?
+
+No. Tokenscope reads the JSONL logs your Claude Code already writes to ~/.claude/projects/, prices them against a locally cached snapshot of models.dev and LiteLLM, and renders the statistics in your dashboard. There is no telemetry, no account, and no API key.
+
+### How is the cost calculated?
+
+Input/output types (input, cache write, cache read, output) are each priced at their corresponding rate, pulled from models.dev first, LiteLLM as a fallback, then a built-in snapshot when offline. Rate data is cached on disk for 24 hours. The numbers track Anthropic's billing to the cent for priced Claude models; models with no published pricing are temporarily flagged as unpriced in the panel.
+
+### How does Tokenscope compare to ccusage?
+
+ccusage (github.com/ryoppippi/ccusage) is a terminal CLI over the same JSONL files: run `npx ccusage` for a one-shot summary in the shell. Tokenscope reads the same logs and uses the same models.dev and LiteLLM rate tables, but as a menu-bar / system-tray GUI. Today's token cost is always visible, and the panel adds bar charts, a donut chart, and a heatmap. Reach for ccusage when you want a scriptable terminal command; reach for Tokenscope when you want to visualize usage anytime.
+
+### Will it slow down my computer?
+
+No. The background process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory holds steady around 40MB.
+
+### What about Cursor, Codex CLI, or other terminals?
+
+Today only Claude Code's JSONL format is parsed. Other tools write different log shapes. Open an issue on the GitHub repo with a redacted log sample and support may be added.
+
+### Is it really free?
+
+Yes. Tokenscope is MIT licensed with no paid tier, and it never sells your data. The source is at github.com/HduSy/tokenscope.
+
+---
+
+Last updated: 2026-07
