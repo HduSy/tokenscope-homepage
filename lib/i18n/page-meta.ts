@@ -36,7 +36,6 @@ export function buildPageMetadata(locale: Locale): Metadata {
       "Claude Code cost",
       "Claude Code token cost",
       "Claude Code token usage",
-      "Claude CLI",
       "token cost",
       "token usage",
       "Claude usage tracker",
@@ -137,8 +136,6 @@ export function buildJsonLd(locale: Locale) {
         isAccessibleForFree: true,
         inLanguage,
         featureList: dict.jsonLd.features,
-        programmingLanguage: ["Rust", "TypeScript", "React"],
-        codeRepository: "https://github.com/HduSy/tokenscope",
         author: {
           "@type": "Person",
           name: "HduSy",
