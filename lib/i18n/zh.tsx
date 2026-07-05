@@ -436,7 +436,7 @@ export const zh: Dict = {
         avatar: "/avatars/dingyi.jpg",
         link: "https://x.com/dingyi/status/2072454710909624813",
       },
-      "Tokenscope 有个很实用的场景：看清在一个刷新周期内，各家 Coding-Plan 和订阅档位实际能用到多少 Token。智谱 Lite 的 5h Coding-Plan 大概 2000 万；字节火山方舟 Pro 5h 大概 7000 万。",
+      "Tokenscope 有个很实用的场景：看清在一个刷新周期内，各家 Coding-Plan 和订阅档位实际能用到多少 Token。智谱 Lite 的 5h Coding-Plan 大概 20M；字节火山方舟 Pro 5h 大概 70M。",
       "Tokenscope 的「按模型看 Token / 费用」一眼就能对比出不同模型有多贵。同样的用量，GLM-5.2 大概只要 Claude-Opus-4-8 的七分之一。",
       {
         quote: "这个真的比自己写小玩意的好看太多了😂",
@@ -446,6 +446,13 @@ export const zh: Dict = {
         link: "https://x.com/haogre/status/2072511887431147738",
       },
       "Tokenscope 同时给你日、周、月三种维度的拆分，周和月的视图还能让你看清自己使用 AI 的习惯和规律，挺有意思的。再加上一个 GitHub 风格的 commit 热力图，能完整看到自己在 AI 上投了多少时间。",
+      {
+        quote: "做得很棒",
+        name: "terryaidev",
+        role: "AI SDE - Bay Area 混吃｜3辆 Tesla Model 3/Y history owner + FSD 坚定拥护者｜当你以为我会鸽的时候我鸽了，亦是一种不鸽。—《鸽式哲学》鸽德",
+        avatar: "/avatars/terryaidev.jpg",
+        link: "https://x.com/terryaidev/status/2072904647719981368",
+      },
       "Tokenscope 的截图功能也很方便 —— 一键就能分享到社交平台，大家可以一起对比一下，晒晒「成绩单」。",
     ],
   },
