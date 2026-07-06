@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Dev-only: allow this LAN origin so the page hydrates when previewing from
+  // a phone on the same WiFi (e.g. http://192.168.5.7:3001). Without it, Next
+  // blocks cross-origin dev resources (/_next/webpack-hmr and friends) and the
+  // client bundle never hydrates — so every <Reveal> section stays at its
+  // pre-paint opacity:0 and the middle of the page renders blank. No effect in
+  // production builds. Swap the IP if your machine's LAN address changes.
+  allowedDevOrigins: ["192.168.5.7"],
+
   // Cookie-driven locale routing, handled by Vercel's routing layer at the
   // CDN edge — NOT a middleware function invocation. The `has: cookie`
   // condition is compiled into Vercel's routing config at build time, so
