@@ -36,8 +36,8 @@ function FaqRow({
         <Icon
           name="plus"
           size={18}
-          className={`transition-[transform,color] duration-300 ease-out ${
-            open ? "rotate-45 text-accent" : "text-dim"
+          className={`shrink-0 transition duration-300 ease-out ${
+            open ? "rotate-45 scale-[1.2] text-accent" : "text-dim"
           }`}
         />
       </button>
