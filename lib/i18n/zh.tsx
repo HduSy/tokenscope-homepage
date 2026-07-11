@@ -365,6 +365,39 @@ export const zh: Dict = {
         ),
       },
       {
+        q: "Tokenscope 和 opencode-tokenscope 是同一个东西吗？",
+        aPlain:
+          "不是，两者只是恰好撞名。opencode-tokenscope（github.com/ramtinJ95/opencode-tokenscope）是 opencode 的插件，用于分析 opencode 会话内的 Token 用量和费用；Tokenscope 是面向 Claude Code 的。两者分属不同的工具生态、代码互不相关。不过 Tokenscope 是开源的，欢迎 fork 一个 opencode 版本出来。",
+        a: (
+          <>
+            不是，两者只是恰好撞名。
+            <a
+              href="https://github.com/ramtinJ95/opencode-tokenscope"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              opencode-tokenscope
+            </a>{" "}
+            是 opencode 的插件，用于分析 opencode 会话内的 Token
+            用量和费用；Tokenscope 是面向 Claude Code
+            的。两者分属不同的工具生态、代码互不相关。不过 Tokenscope
+            是开源的，欢迎{" "}
+            <a
+              href="https://github.com/HduSy/tokenscope/fork"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              fork
+            </a>{" "}
+            一个 opencode 版本出来。
+          </>
+        ),
+      },
+      {
         q: "会不会拖慢我的电脑？",
         aPlain:
           "不会。后台进程只监听项目目录的文件变化，仅重新解析 mtime 有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。",

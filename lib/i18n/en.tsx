@@ -434,6 +434,38 @@ export const en = {
         ),
       },
       {
+        q: "Is Tokenscope the same as opencode-tokenscope?",
+        aPlain:
+          "No — they are different tools that happen to share a name. opencode-tokenscope (github.com/ramtinJ95/opencode-tokenscope) is a plugin for opencode that analyzes token usage and cost inside opencode sessions; Tokenscope is for Claude Code. Different ecosystems, no shared code. That said, Tokenscope is open source — you're welcome to fork it and spin up an opencode edition.",
+        a: (
+          <>
+            No — they are different tools that happen to share a name.{" "}
+            <a
+              href="https://github.com/ramtinJ95/opencode-tokenscope"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              opencode-tokenscope
+            </a>{" "}
+            is a plugin for opencode that analyzes token usage and cost inside
+            opencode sessions; Tokenscope is for Claude Code. Different ecosystems, no shared code. That said, Tokenscope
+            is open source — you&apos;re welcome to{" "}
+            <a
+              href="https://github.com/HduSy/tokenscope/fork"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              fork it
+            </a>{" "}
+            and spin up an opencode edition.
+          </>
+        ),
+      },
+      {
         q: "Will it slow down my computer?",
         aPlain:
           "No. The background process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory holds steady around 40MB. Refreshing the panel is just a single pass over the new JSONL bytes since the last read. Performance is excellent.",
