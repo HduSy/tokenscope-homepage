@@ -3,6 +3,7 @@ import { ThemeInit } from "@/components/ThemeInit";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastHost } from "@/components/Toast";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { VibeLoftTelemetry } from "@/components/VibeLoftTelemetry";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -71,6 +72,10 @@ export function HtmlShell({
         <ThemeInit />
         {/* GA4 loads afterInteractive so it never blocks first paint. */}
         <GoogleAnalytics />
+        {/* VibeLoft Web Telemetry: afterInteractive, same non-blocking
+            rationale as GA4. Events only accepted from the registered
+            production origin. */}
+        <VibeLoftTelemetry />
         {/* Vercel Web Analytics: mode defaults to 'auto', so it only reports
             on production deployments — no dev/local noise. */}
         <Analytics />
