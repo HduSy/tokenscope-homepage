@@ -466,6 +466,42 @@ export const en = {
         ),
       },
       {
+        q: "Is there a Tokenscope for DeepSeek Harness?",
+        aPlain:
+          "Yes — dsh-tokenscope (github.com/HduSy/dsh-tokenscope) is a usage-dashboard plugin for DeepSeek Harness, developed by the same author as a Tokenscope-inspired adaptation. It brings Tokenscope's interaction and data semantics — daily/weekly/monthly tokens, estimated cost, cache-hit split, per-model distribution, tool-call ranks, and the activity heatmap — into the Harness Web GUI's settings panel. So you get the same at-a-glance usage view whether you're coding with Claude Code or running jobs in DeepSeek Harness.",
+        a: (
+          <>
+            Yes.{" "}
+            <a
+              href="https://github.com/HduSy/dsh-tokenscope"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              dsh-tokenscope
+            </a>{" "}
+            is a usage-dashboard plugin for{" "}
+            <a
+              href="https://deepseek.com/harness/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              DeepSeek Harness
+            </a>
+            , developed by the same author as a Tokenscope-inspired
+            adaptation. It brings Tokenscope&apos;s interaction and data
+            semantics — daily/weekly/monthly tokens, estimated cost,
+            cache-hit split, per-model distribution, tool-call ranks, and the
+            activity heatmap — into the Harness Web GUI&apos;s settings panel.
+            So you get the same at-a-glance usage view whether you&apos;re
+            coding with Claude Code or running jobs in DeepSeek Harness.
+          </>
+        ),
+      },
+      {
         q: "Will it slow down my computer?",
         aPlain:
           "No. The background process watches the projects directory for file changes and only re-parses files whose mtime moved. Idle CPU is essentially zero and memory holds steady around 40MB. Refreshing the panel is just a single pass over the new JSONL bytes since the last read. Performance is excellent.",

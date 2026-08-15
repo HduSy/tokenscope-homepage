@@ -398,6 +398,39 @@ export const zh: Dict = {
         ),
       },
       {
+        q: "有适配 DeepSeek Harness 的 Tokenscope 插件吗？",
+        aPlain:
+          "有。dsh-tokenscope（github.com/HduSy/dsh-tokenscope）是 DeepSeek Harness 的用量仪表盘插件，由同一作者参考 Tokenscope 衍生开发：把 Tokenscope 的交互和数据口径（日/周/月 Token、估算花费、缓存命中拆分、按模型分布、工具调用排行、活跃热力图）适配成 Harness Web GUI 设置面板里的「用量」小节。无论你用 Claude Code 写代码，还是在 DeepSeek Harness 里跑任务，都能看到同样的直观用量视图。",
+        a: (
+          <>
+            有的。{" "}
+            <a
+              href="https://github.com/HduSy/dsh-tokenscope"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              dsh-tokenscope
+            </a>{" "}
+            是{" "}
+            <a
+              href="https://deepseek.com/harness/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent"
+              style={linkBorder}
+            >
+              DeepSeek Harness
+            </a>{" "}
+            的用量仪表盘插件，由同一作者参考 Tokenscope 衍生开发：把
+            Tokenscope 的交互和数据口径（日/周/月 Token、估算花费、缓存命中拆分、按模型分布、工具调用排行、活跃热力图）适配成 Harness Web GUI
+            设置面板里的「用量」小节。无论你用 Claude Code
+            写代码，还是在 DeepSeek Harness 里跑任务，都能看到同样的直观用量视图。
+          </>
+        ),
+      },
+      {
         q: "会不会拖慢我的电脑？",
         aPlain:
           "不会。后台进程只监听项目目录的文件变化，仅重新解析 mtime 有变动的文件。空闲时 CPU 基本为零，内存稳定在40MB。刷新面板也只是从上次读取位置往后扫一遍新增的 JSONL 字节。性能足够优秀。",
